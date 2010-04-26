@@ -65,6 +65,9 @@
 
           <sourceDirectory>.</sourceDirectory>
 
+          <includeDirs>
+			<includeDir>${env.OPENBUS_HOME}/idlpath/</includeDir>
+          </includeDirs>
           <sources>
             <source>
               <excludes>
