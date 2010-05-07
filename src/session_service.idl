@@ -18,6 +18,12 @@ module session_service {
  */
 module v1_05 {
 
+/** \brief Representa o identificador de uma sessão. */
+typedef tecgraf::openbus::core::v1_05::Identifier SessionIdentifier;
+
+/** \brief Representa o identificador do membro de uma sessão. */
+typedef tecgraf::openbus::core::v1_05::Identifier MemberIdentifier;
+
 /** \brief Representa um evento trocado entre membros de uma sessão */
 struct SessionEvent {
   string type;
@@ -31,21 +37,18 @@ interface SessionEventSink {
     /**
      * \brief Recebe um evento.
      *
+     * \param sender O identificador do membro que está enviado o evento.
      * \param ev O evento enviado
      */
-  void push(in SessionEvent ev);
+  void push(in MemberIdentifier sender, in SessionEvent ev);
 
     /**
      * \brief Notificação de finalização do canal de comunicação.
+     *
+     * \param sender O identificador do membro que está enviado o evento.
      */
-  void disconnect();
+  void disconnect(in MemberIdentifier sender);
 };
-
-/** \brief Representa o identificador de uma sessão. */
-typedef tecgraf::openbus::core::v1_05::Identifier SessionIdentifier;
-
-/** \brief Representa o identificador do membro de uma sessão. */
-typedef tecgraf::openbus::core::v1_05::Identifier MemberIdentifier;
 
 /**
  * \brief Representa uma sessão.

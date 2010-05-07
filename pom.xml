@@ -63,10 +63,9 @@
         <configuration>
           <compiler>jacorb</compiler>
 
-          <sourceDirectory>.</sourceDirectory>
-
+          <sourceDirectory>src</sourceDirectory>
           <includeDirs>
-			<includeDir>${env.OPENBUS_HOME}/idlpath/v1_05</includeDir>
+	    <includeDir>${env.OPENBUS_HOME}/idlpath/v1_05</includeDir>
           </includeDirs>
           <sources>
             <source>
