@@ -2,7 +2,7 @@ descriptors = {
   { name = "idl",
     directory = SVNDIR,
     install_files = {
-      ["src/*.idl"] = "idlpath/v1_05",
+      ["src/*.idl"] = "idlpath/v1_06",
     },
   },
   { name = "jacorb-2.3.0",

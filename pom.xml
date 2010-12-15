@@ -11,7 +11,7 @@
   <url>https://subversion.tecgraf.puc-rio.br/engdist/openbus/idl/trunk</url>
 
   <properties>
-    <java.version>1.6</java.version>
+    <java.version>1.5</java.version>
     <scs.version>1.3-SNAPSHOT</scs.version>
     <jacorb.version>2.3.0</jacorb.version>
     <source.encoding>ISO-8859-1</source.encoding>
@@ -65,7 +65,7 @@
 
           <sourceDirectory>src</sourceDirectory>
           <includeDirs>
-	    <includeDir>${env.OPENBUS_HOME}/idlpath/v1_05</includeDir>
+	    <includeDir>${env.OPENBUS_HOME}/idlpath/v1_06</includeDir>
           </includeDirs>
           <sources>
             <source>

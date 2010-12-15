@@ -6,17 +6,17 @@ module tecgraf {
 module openbus {
 
 /**
- * \brief M√≥dulo do Servi√ßo Tolerante a Falhas.
+ * \brief MÛdulo do ServiÁo Tolerante a Falhas.
  */
 module fault_tolerance {
 
 /**
- * \brief M√≥dulo de versionamento do Servi√ßo Tolerante a Falhas.
+ * \brief MÛdulo de versionamento do ServiÁo Tolerante a Falhas.
  */
-module v1_05 {
+module v1_06 {
 
 /**
- * \brief Representa o servi√ßo tolerante a falhas.
+ * \brief Representa o serviÁo tolerante a falhas.
  */
 interface IFaultTolerantService {
 
@@ -26,7 +26,7 @@ interface IFaultTolerantService {
   void init();
 
   /**
-   * \brief Verifica se o servi√ßo est√° vivo ou sem erros.
+   * \brief Verifica se o serviÁo est· vivo ou sem erros.
    *
    * \return \c true, caso esteja vivo, ou \c false, caso
    * esteja em estado de falha.
@@ -40,7 +40,7 @@ interface IFaultTolerantService {
   boolean updateStatus(in any param);    
 };
 
-/** \brief Representa o servi√ßo tolerante a falhas. */
+/** \brief Representa o serviÁo tolerante a falhas. */
 typedef IFaultTolerantService ftService;
 
 /**
@@ -48,13 +48,13 @@ typedef IFaultTolerantService ftService;
  */
 interface IFTServiceMonitor {
   /**
-   * \brief Monitora o servi√ßo e cria uma nova r√©plica se necess√°rio.
+   * \brief Monitora o serviÁo e cria uma nova rÈplica se necess·rio.
    *
    */
    void monitor();
 };
 
-}; // v1_05
+}; // version
 
 }; // fault_tolerance
 

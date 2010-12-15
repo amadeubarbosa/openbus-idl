@@ -16,13 +16,13 @@ module session_service {
 /**
  * \brief Módulo de versionamento do Serviço de Sessão.
  */
-module v1_05 {
+module v1_06 {
 
 /** \brief Representa o identificador de uma sessão. */
-typedef tecgraf::openbus::core::v1_05::Identifier SessionIdentifier;
+typedef tecgraf::openbus::core::v1_06::Identifier SessionIdentifier;
 
 /** \brief Representa o identificador do membro de uma sessão. */
-typedef tecgraf::openbus::core::v1_05::Identifier MemberIdentifier;
+typedef tecgraf::openbus::core::v1_06::Identifier MemberIdentifier;
 
 /** \brief Representa um evento trocado entre membros de uma sessão */
 struct SessionEvent {
@@ -113,7 +113,7 @@ interface ISessionService {
     scs::core::IComponent getSession();
 };
 
-}; // v1_05
+}; // version
 
 }; // session_service
 

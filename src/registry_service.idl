@@ -11,7 +11,7 @@ module openbus {
 
 module core {
 
-module v1_05 {
+module v1_06 {
 
 /**
  * \brief Módulo do Serviço de Registro.
@@ -52,7 +52,7 @@ typedef sequence<Facet> FacetList;
  */
 struct ServiceOfferEntry {
   ServiceOffer aServiceOffer; /**< \brief Oferta de servico. */
-  tecgraf::openbus::core::v1_05::access_control_service::Credential
+  tecgraf::openbus::core::v1_06::access_control_service::Credential
       aCredential;/**< \brief Credential do servico que disponibiliza a oferta. */
   RegistryIdentifier identifier; /**< \brief O identificador do registro de um serviço. */
   string authorizedFacets;/**< \brief As facetas (serializadas em strings) autorizadas do membro que oferta o servico */
@@ -372,7 +372,7 @@ interface IManagement {
 
 }; // registry_service
 
-}; // v1_05
+}; // version
 
 }; // core
 

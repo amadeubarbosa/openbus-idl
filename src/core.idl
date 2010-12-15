@@ -22,7 +22,7 @@ module core {
 /**
  * \brief Módulo de versionamento dos Serviços Básicos do OpenBus.
  */
-module v1_05 {
+module v1_06 {
 
 /** \brief Representa um identificador universalmente único. */
 typedef string UUID;
@@ -36,7 +36,7 @@ typedef sequence<octet> OctetSeq;
 /** \brief Representa uma sequência de booleanos. */
 typedef sequence<boolean> BooleanSeq;
 
-}; // v1_05
+}; // version
 
 }; // core
 

@@ -10,7 +10,7 @@ module openbus {
 
 module core {
 
-module v1_05 {
+module v1_06 {
 
 /**
  * \brief Módulo do Serviço de Controle de Acesso.
@@ -500,7 +500,7 @@ interface IManagement {
 
 }; // access_control_service
 
-}; // v1_05
+}; // version
 
 }; // core
 
