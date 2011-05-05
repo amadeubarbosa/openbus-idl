@@ -181,6 +181,9 @@ exception InterfaceIdentifierAlreadyExists {};
 
 /*---------------------------- Autorização -----------------------------*/
 
+/** \brief Tempo em (\b milissegundos) desde 1 de janeiro de 1970. */
+typedef long TimeStamp;
+
 /** Tipo da autorização */
 enum AuthorizationType { ATUser, ATSystemDeployment };
 
@@ -201,6 +204,7 @@ struct ServiceOfferInterface {
   RegistryIdentifier id;              /**< Identificar da oferta */
   string member;                      /**< Identificador do membro que efetuou o registro */
   InterfaceIdentifierList interfaces; /**< Interfaces não autorizadas */
+  TimeStamp registrationDate; /**< Data de registro da oferta */ 
 };
 
 typedef sequence<ServiceOfferInterface> ServiceOfferInterfaceList;
