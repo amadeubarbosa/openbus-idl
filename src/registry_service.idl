@@ -343,24 +343,6 @@ interface IManagement {
   ServiceOfferInterfaceList getOfferedInterfacesByMember(in string member);
 
   /**
-   * \brief Recupera as interfaces oferecidas no registro, mas que os membros
-   * não possuem autorização para ofertá-las.
-   *
-   * \return Seqüência de interfaces não autorizadas aos membros.
-   */
-  ServiceOfferInterfaceList getUnauthorizedInterfaces();
-
-  /**
-   * \brief Recupera as interfaces oferecidas no registro, mas que o dado membro
-   * não possui autorização para ofertá-las.
-   *
-   * \param member Identificador do membro do barramento.
-   *
-   * \return Seqüência de interfaces não autorizadas ao membro.
-   */
-  ServiceOfferInterfaceList getUnauthorizedInterfacesByMember(in string member);
-
-  /**
    * \brief Remove a oferta indicado do registro.
    *
    * Esta operação tem a mesma funcionalidade da oferecida pela interface IRegistryService,
