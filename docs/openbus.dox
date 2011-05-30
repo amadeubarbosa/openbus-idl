@@ -23,7 +23,7 @@ PROJECT_NAME           = "OpenBus IDL"
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = 1.4.0
+PROJECT_NUMBER         = 1.5.0
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -60,6 +60,22 @@ OUTPUT_LANGUAGE        = Brazilian
 # forces the Windows encoding (this is the default for the Windows binary), 
 # whereas setting the tag to NO uses a Unix-style encoding (the default for 
 # all platforms other than Windows).
+
+# The INPUT_ENCODING tag is used to specify the character encoding of the
+# source files that doxygen parses. Internally doxygen uses the UTF-8 encoding,
+# which is also the default input encoding. Doxygen uses libiconv (or the iconv
+# built into libc) for the transcoding. See the libiconv documentation for the
+# list of possible encodings.
+
+INPUT_ENCODING         = ISO-8859-1
+
+# The DOXYFILE_ENCODING tag specifies the encoding used for all characters in
+# the config file that follow. The default is UTF-8 which is also the encoding
+# used for all text before the first occurrence of this tag. Doxygen uses
+# libiconv (or the iconv built into libc) for the transcoding. See
+# http://www.gnu.org/software/libiconv for the list of possible encodings.
+
+DOXYFILE_ENCODING      = ISO-8859-1
 
 USE_WINDOWS_ENCODING   = NO
 
@@ -459,7 +475,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../../core/idl
+INPUT                  = ../src
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -744,7 +760,7 @@ TREEVIEW_WIDTH         = 250
 # If the GENERATE_LATEX tag is set to YES (the default) Doxygen will 
 # generate Latex output.
 
-GENERATE_LATEX         = NO
+GENERATE_LATEX         = YES
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put. 
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be 
@@ -798,7 +814,7 @@ PDF_HYPERLINKS         = NO
 # plain latex in the generated Makefile. Set this option to YES to get a 
 # higher quality PDF documentation.
 
-USE_PDFLATEX           = NO
+USE_PDFLATEX           = YES
 
 # If the LATEX_BATCHMODE tag is set to YES, doxygen will add the \\batchmode. 
 # command to the generated LaTeX files. This will instruct LaTeX to keep 
