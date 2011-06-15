@@ -115,7 +115,7 @@ interface IRegistryService {
      *
      * \exception UnauthorizedFacets Serviço sem autorização para publicar uma
      *   ou mais facetas.
-     * \exception ServiceOfferNonExistent O membro não possui nenhuma oferta
+     * \exception ServiceOfferDoesNotExist O membro não possui nenhuma oferta
      *   relacionada com o identificador informado.
      */
     void setOfferProperties (in OfferIdentifier identifier, in PropertyList newProperties)
@@ -253,9 +253,9 @@ interface IManagement {
    *
    * \param ifaceId Identificador de interface.
    *
-   * \exception InterfaceIdentifierNonExistent Identificador não cadastrado.
-   * \exception InterfaceIdentifierInUse Identificador é referenciado por
-   *   algum elemento do sistema.
+   * \exception InterfaceDoesNotExist Identificador não cadastrado.
+   * \exception InterfaceInUse Identifice é referenciada por algum elemento do 
+   *   sistema.
    */
   void removeInterface(in InterfaceIdentifier ifaceId)
     raises (InterfaceInUse, InterfaceDoesNotExist, ServiceFailure);
@@ -277,8 +277,8 @@ interface IManagement {
    * \param id Identificador do membro do barramento (usuário ou implantação).
    * \param ifaceId Identificador da interface ou expressão regular.
    *
-   * \exception MemberNonExistent Membro não cadastrado.
-   * \exception InterfaceIdentifierNonExistent Interface não cadastrada.
+   * \exception EntityDoesNotExist Entidade não cadastrada.
+   * \exception InterfaceDoesNotExist Interface não cadastrada.
    * \exception InvalidRegularExpression Identificador da interface possui
    *   uma expressão regular inválida.
    */
@@ -292,7 +292,7 @@ interface IManagement {
    * \param id Identificador do membro cadastrado.
    * \param ifaceId Identificador da interface.
    *
-   * \exception AuthorizationNonExistent Membro não possui autorização.
+   * \exception AuthorizationDoesNotExist Membro não possui autorização.
    */
   void revoke(in string entityId, in InterfaceIdentifier ifaceId)
     raises (AuthorizationDoesNotExist, ServiceFailure);
@@ -301,7 +301,7 @@ interface IManagement {
    * \brief Remove a autorização do membro.
    *
    * \param id Identificador do membro.
-   * \exception AuthorizationNonExistent Membro não possui autorização.
+   * \exception EntityHasNoAuthorization Entidade não possui autorização.
    */
   void revokeAll(in string entityId)
     raises (EntityHasNoAuthorization, ServiceFailure);
@@ -312,7 +312,7 @@ interface IManagement {
    * \param id Identificador do membro.
    *
    * \return Autorização do membro.
-   * \exception AuthorizationNonExistent Membro não possui autorização.
+   * \exception EntityHasNoAuthorization Entidade não possui autorização.
    */
   EntityAuthorizations getEntityAuthorizations(in string entityId)
     raises (EntityHasNoAuthorization, ServiceFailure);

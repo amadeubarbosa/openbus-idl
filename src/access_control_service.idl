@@ -407,7 +407,6 @@ interface IManagement {
    * \return Certificado da implantação.
    *
    * \exception SystemDeploymentDoesNotExist Implantação não cadastrada.
-   * \exception SystemCertificateNonExistent Implantação não possui certificado.
    */
   Certificate getSystemDeploymentCertificate(in string id)
     raises (SystemDeploymentDoesNotExist, ServiceFailure);
