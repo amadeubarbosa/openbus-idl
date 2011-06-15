@@ -39,7 +39,7 @@ struct ServiceOffer {
 typedef sequence<ServiceOffer> ServiceOfferList;
 
 /** \brief O identificador do registro de um serviço. */
-typedef Identifier RegistryIdentifier;
+typedef Identifier OfferIdentifier;
 
 /**
  * \brief Representa uma faceta.
@@ -54,7 +54,7 @@ struct ServiceOfferEntry {
   ServiceOffer aServiceOffer; /**< \brief Oferta de servico. */
   tecgraf::openbus::core::v1_06::access_control_service::Credential
       aCredential;/**< \brief Credential do servico que disponibiliza a oferta. */
-  RegistryIdentifier identifier; /**< \brief O identificador do registro de um serviço. */
+  OfferIdentifier identifier; /**< \brief O identificador do registro de um serviço. */
   string authorizedFacets;/**< \brief As facetas (serializadas em strings) autorizadas do membro que oferta o servico */
   PropertyList properties;/**< \brief As propriedades da oferta */
 };
@@ -65,12 +65,16 @@ struct ServiceOfferEntry {
 typedef sequence<ServiceOfferEntry> ServiceOfferEntryList;
 
 /** \brief Indica que o serviço tentou registrar alguma faceta não autorizada */
-exception UnathorizedFacets {
+exception UnauthorizedFacets {
   FacetList facets; /**< \brief Lista de facetas não autorizadas */
 };
 
 /** \brief Indica que Serviço de Registro não possui a oferta de serviço indicada */
-exception ServiceOfferNonExistent { };
+exception ServiceOfferDoesNotExist {};
+
+exception InvalidMember {};
+
+exception InvalidProperties{};
 
 /**
  * \brief Representa o serviço de registro.
@@ -83,11 +87,12 @@ interface IRegistryService {
      *
      * \return Um identificador para o registro.
      *
-     * \exception UnathorizedFacets Serviço sem autorização para publicar uma
+     * \exception UnauthorizedFacets Serviço sem autorização para publicar uma
      *  ou mais facetas.
      */
-    RegistryIdentifier register(in ServiceOffer aServiceOffer)
-      raises (UnathorizedFacets);
+    OfferIdentifier register(in PropertyList properties,
+      in scs::core::IComponent member) raises (InvalidMember,
+      InvalidProperties, UnauthorizedFacets, ServiceFailure);
 
     /**
      * \brief Remove uma oferta de serviço.
@@ -97,7 +102,7 @@ interface IRegistryService {
      * \return \c true, caso a oferta de serviço seja removida, ou \c false,
      * caso contrário.
      */
-    boolean unregister(in RegistryIdentifier identifier);
+    void unregister(in OfferIdentifier identifier) raises (ServiceOfferDoesNotExist, ServiceFailure);
 
     /**
      * \brief Atualiza uma oferta de serviço.
@@ -108,13 +113,13 @@ interface IRegistryService {
      * \return \c true, caso a oferta de serviço seja atualizada, ou \c false,
      * caso contrário.
      *
-     * \exception UnathorizedFacets Serviço sem autorização para publicar uma
+     * \exception UnauthorizedFacets Serviço sem autorização para publicar uma
      *   ou mais facetas.
      * \exception ServiceOfferNonExistent O membro não possui nenhuma oferta
      *   relacionada com o identificador informado.
      */
-    void update(in RegistryIdentifier identifier, in PropertyList newProperties)
-      raises (UnathorizedFacets, ServiceOfferNonExistent);
+    void setOfferProperties (in OfferIdentifier identifier, in PropertyList newProperties)
+      raises (ServiceOfferDoesNotExist, InvalidProperties, ServiceFailure);
 
     /**
      * \brief Realiza uma busca por ofertas através de uma lista de facetas.
@@ -126,7 +131,7 @@ interface IRegistryService {
      *
      * \return As ofertas encontradas.
      */
-    ServiceOfferList find (in FacetList facets);
+    ServiceOfferList find (in FacetList facets) raises (ServiceFailure);
 
     /**
      * \brief Realiza uma busca por ofertas através de uma lista de facetas e critérios.
@@ -140,23 +145,24 @@ interface IRegistryService {
      *
      * \return As ofertas encontradas.
      */
-    ServiceOfferList findByCriteria (in FacetList facets, in PropertyList criteria);
-    
-    
-    /**
-     * \brief Realiza uma busca por ofertas através de uma lista de facetas e 
-     *   critérios, se forem especificados.
-     * 
-     *   Serão selecionadas as ofertas de serviços que implementam todas as 
-     *   facetas descritas em facets, e, que satisfaçam aos critérios 
-     *   (propriedades) especificados.
-     *
-     * \param facets As facetas da busca.
-     * \param criteria Os critérios da busca.
-     *
-     * \return As entradas das ofertas encontradas.
-     */
-    ServiceOfferEntryList localFind (in FacetList facets, in PropertyList criteria);
+    ServiceOfferList findByCriteria (in FacetList facets, in PropertyList criteria) raises (ServiceFailure);
+};
+
+interface ServiceOfferEntryManagement {
+  /**
+   * \brief Realiza uma busca por ofertas através de uma lista de facetas e 
+   *   critérios, se forem especificados.
+   * 
+   *   Serão selecionadas as ofertas de serviços que implementam todas as 
+   *   facetas descritas em facets, e, que satisfaçam aos critérios 
+   *   (propriedades) especificados.
+   *
+   * \param facets As facetas da busca.
+   * \param criteria Os critérios da busca.
+   *
+   * \return As entradas das ofertas encontradas.
+   */
+  ServiceOfferEntryList localFind (in FacetList facets, in PropertyList criteria);
 };
 
 /*----------------------------- Interface ------------------------------*/
@@ -167,56 +173,62 @@ typedef string InterfaceIdentifier;
 /** \brief Seqüência de indetificadores de interface. */
 typedef sequence<InterfaceIdentifier> InterfaceIdentifierList;
 
+exception InvalidInterfaceIdentifier {};
+
 /** \brief Identificador de interface em uso por alguma autorização. */
-exception InterfaceIdentifierInUse {};
+exception InterfaceInUse {};
 
 /** \brief Identificador de interface não encontrado. */
 exception InterfaceIdentifierNotFound {};
 
 /** \brief Identificador de interface não existente. */
-exception InterfaceIdentifierNonExistent {};
+exception InterfaceDoesNotExist {};
 
 /** \brief Identificador de interface já cadastrado.*/
-exception InterfaceIdentifierAlreadyExists {};
+exception InterfaceAlreadyExists {};
 
 /*---------------------------- Autorização -----------------------------*/
-
-/** \brief Tempo em (\b milissegundos) desde 1 de janeiro de 1970. */
-typedef long TimeStamp;
 
 /** Tipo da autorização */
 enum AuthorizationType { ATUser, ATSystemDeployment };
 
-/** \brief Autorização para uma implantação de sistema. */
 struct Authorization {
-  string id; /**< Identificador do membro */
+  string entityId;
+  string interfaceIdentifier;
+};
+typedef sequence<Authorization> AuthorizationList;
+
+/** \brief Autorização para uma implantação de sistema. */
+struct EntityAuthorizations {
+  string entityId; /**< Identificador do membro */
   AuthorizationType type; /**< Tipo de membro que tem autorização */
   InterfaceIdentifierList authorized; /**< Interfaces autorizadas */
 };
 
 /** \brief Seqüência de autorizações. */
-typedef sequence<Authorization> AuthorizationList;
+typedef sequence<EntityAuthorizations> EntityAuthorizationsList;
 
 /**
  * \brief Representa as facetas em uma entrada no Serviço de Registro
  */
-struct ServiceOfferInterface {
-  RegistryIdentifier id;              /**< Identificar da oferta */
-  string member;                      /**< Identificador do membro que efetuou o registro */
+struct OfferedInterfaces {
+  OfferIdentifier offerId;              /**< Identificar da oferta */
+  string entityId;                      /**< Identificador do membro que efetuou o registro */
   InterfaceIdentifierList interfaces; /**< Interfaces não autorizadas */
-  TimeStamp registrationDate; /**< Data de registro da oferta */ 
 };
 
-typedef sequence<ServiceOfferInterface> ServiceOfferInterfaceList;
+typedef sequence<OfferedInterfaces> OfferedInterfacesList;
 
 /** \brief Membro não existe. */
-exception MemberNonExistent {};
+exception EntityDoesNotExist {};
 
 /** \brief Autorização não existe. */
-exception AuthorizationNonExistent {};
+exception AuthorizationDoesNotExist {};
 
 /** \brief Expressão regular inválida. */
 exception InvalidRegularExpression {};
+
+exception EntityHasNoAuthorization {};
 
 /**
  * \brief Interface de gerenciamento de autorizações de serviços.
@@ -233,8 +245,8 @@ interface IManagement {
    * \param ifaceId Identificador de interface.
    * \exception InterfaceIdentifierAlreadyExists Identificador já cadastrado.
    */
-  void addInterfaceIdentifier(in InterfaceIdentifier ifaceId)
-    raises (InterfaceIdentifierAlreadyExists);
+  void addInterface(in InterfaceIdentifier ifaceId)
+    raises (InterfaceAlreadyExists, InvalidInterfaceIdentifier, ServiceFailure);
 
   /**
    * \brief Remove o identificador.
@@ -245,15 +257,15 @@ interface IManagement {
    * \exception InterfaceIdentifierInUse Identificador é referenciado por
    *   algum elemento do sistema.
    */
-  void removeInterfaceIdentifier(in InterfaceIdentifier ifaceId)
-    raises (InterfaceIdentifierInUse, InterfaceIdentifierNonExistent);
+  void removeInterface(in InterfaceIdentifier ifaceId)
+    raises (InterfaceInUse, InterfaceDoesNotExist, ServiceFailure);
 
   /**
    * \brief Recupera todos os identificadores de interface cadastrados.
    *
    * \return Seqüência de identificadores de interface.
    */
-  InterfaceIdentifierList getInterfaceIdentifiers();
+  InterfaceIdentifierList getInterfaces() raises (ServiceFailure);
 
   /*-------------------------- Autorização -----------------------------*/
 
@@ -264,17 +276,15 @@ interface IManagement {
    *
    * \param id Identificador do membro do barramento (usuário ou implantação).
    * \param ifaceId Identificador da interface ou expressão regular.
-   * \param strict Força que a interface esteja previamente cadastrada.
-   *   Esse parâmetro não possui efeito se ifaceId for uma expressão regular.
    *
    * \exception MemberNonExistent Membro não cadastrado.
    * \exception InterfaceIdentifierNonExistent Interface não cadastrada.
    * \exception InvalidRegularExpression Identificador da interface possui
    *   uma expressão regular inválida.
    */
-  void grant(in string id, in InterfaceIdentifier ifaceId, in boolean strict)
-    raises (MemberNonExistent, InterfaceIdentifierNonExistent,
-    InvalidRegularExpression);
+  void grant(in string entityId, in InterfaceIdentifier ifaceId)
+    raises (EntityDoesNotExist,
+    InterfaceDoesNotExist, InvalidRegularExpression);
 
   /**
    * \brief Revoga a autorização para exportar a interface.
@@ -284,8 +294,8 @@ interface IManagement {
    *
    * \exception AuthorizationNonExistent Membro não possui autorização.
    */
-  void revoke(in string id, in InterfaceIdentifier ifaceId)
-    raises (AuthorizationNonExistent);
+  void revoke(in string entityId, in InterfaceIdentifier ifaceId)
+    raises (AuthorizationDoesNotExist, ServiceFailure);
 
   /**
    * \brief Remove a autorização do membro.
@@ -293,8 +303,8 @@ interface IManagement {
    * \param id Identificador do membro.
    * \exception AuthorizationNonExistent Membro não possui autorização.
    */
-  void removeAuthorization(in string id)
-    raises (AuthorizationNonExistent);
+  void revokeAll(in string entityId)
+    raises (EntityHasNoAuthorization, ServiceFailure);
 
   /**
    * \brief Recupera a autorização de um membro.
@@ -304,15 +314,15 @@ interface IManagement {
    * \return Autorização do membro.
    * \exception AuthorizationNonExistent Membro não possui autorização.
    */
-  Authorization getAuthorization(in string id)
-    raises (AuthorizationNonExistent);
+  EntityAuthorizations getEntityAuthorizations(in string entityId)
+    raises (EntityHasNoAuthorization, ServiceFailure);
 
   /**
    * \brief Recupera todas as autorizações cadastradas.
    *
    * \return Seqüência de autorizações.
    */
-  AuthorizationList getAuthorizations();
+  EntityAuthorizationsList getAllEntityAuthorizations() raises (ServiceFailure);
 
   /**
    * \brief Recupera as autorizações que contêm \e todas as interfaces
@@ -322,15 +332,16 @@ interface IManagement {
    *
    * \return Seqüência de autorizações.
    */
-  AuthorizationList getAuthorizationsByInterfaceId(
-    in InterfaceIdentifierList ifaceIds);
+  EntityAuthorizationsList getAuthorizationsByInterfaceId(
+    in InterfaceIdentifierList ifaceIds) raises (InterfaceDoesNotExist,
+    ServiceFailure);
 
   /**
    * \brief Recupera todas as interfaces oferecidas no registro.
    *
    * \return Seqüência de interfaces registradas.
    */
-  ServiceOfferInterfaceList getOfferedInterfaces();
+   OfferedInterfacesList getOfferedInterfaces() raises (ServiceFailure);
 
   /**
    * \brief Recupera todas as interfaces oferecidas no registro por 
@@ -340,20 +351,8 @@ interface IManagement {
    *
    * \return Seqüência de interfaces registradas pelo membro.
    */
-  ServiceOfferInterfaceList getOfferedInterfacesByMember(in string member);
-
-  /**
-   * \brief Remove a oferta indicado do registro.
-   *
-   * Esta operação tem a mesma funcionalidade da oferecida pela interface IRegistryService,
-   * mas esta é permitida apenas aos administradores, enquanto a aquela é destinada ao
-   * membro que efetuou o registro.
-   * 
-   * \param id Identificador da oferta no registro.
-   *
-   * \return \c true se a oferta foi removida com sucesso, \c false caso contrário.
-   */
-  boolean unregister(in RegistryIdentifier id);
+  OfferedInterfacesList getOfferedInterfacesByEntity(in string entityId)
+    raises (EntityDoesNotExist, ServiceFailure);
 };
 
 }; // registry_service

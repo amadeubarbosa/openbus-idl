@@ -36,6 +36,13 @@ typedef sequence<octet> OctetSeq;
 /** \brief Representa uma sequência de booleanos. */
 typedef sequence<boolean> BooleanSeq;
 
+/** \brief Indica uma falha inesperada em um serviço básico. */
+exception ServiceFailure {
+	string fMessage; /**< \brief Descreve a razão da falha. */
+};
+
+
+
 }; // version
 
 }; // core
