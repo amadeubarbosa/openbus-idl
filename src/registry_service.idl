@@ -268,47 +268,56 @@ interface IManagement {
   /*-------------------------- Autorização -----------------------------*/
 
   /**
-   * \brief Autoriza o membro a exportar a interface.
-   *   O Serviço de  Acesso é consultado  para verificar  se o usuário
-   *   ou a implantação estão cadastrados.
+   * \brief Autoriza uma entidade a exportar a interface.
    *
-   * \param id Identificador do membro do barramento (usuário ou implantação).
-   * \param ifaceId Identificador da interface ou expressão regular.
+   * \param entityId Identificador da entidade cadastrada.
+   * \param ifaceId Identificador da interface cadastrada.
    *
-   * \exception EntityDoesNotExist Entidade não cadastrada.
-   * \exception InterfaceDoesNotExist Interface não cadastrada.
+   * \exception EntityDoesNotExist Identificador da entidade não está cadastrada.
+   * \exception InterfaceDoesNotExist Identificador da interface não está cadastrada.
    * \exception InvalidRegularExpression Identificador da interface possui
    *   uma expressão regular inválida.
    */
   void grant(in string entityId, in InterfaceIdentifier ifaceId)
     raises (EntityDoesNotExist, InterfaceDoesNotExist,
-    InvalidRegularExpression, ServiceFailure);
+            InvalidRegularExpression, ServiceFailure);
 
   /**
    * \brief Revoga a autorização para exportar a interface.
    *
-   * \param id Identificador do membro cadastrado.
-   * \param ifaceId Identificador da interface.
+   * \param entityId Identificador da entidade cadastrada.
+   * \param ifaceId Identificador da interface cadastrada.
    *
-   * \exception AuthorizationDoesNotExist Membro não possui autorização.
+   * \return TRUE caso uma autorização tenha sido revogada, ou FALSE se a
+   *         autorização especificada não existia.
+   *
+   * \exception EntityDoesNotExist Identificador da entidade não está cadastrada.
+   * \exception InterfaceDoesNotExist Identificador da interface não está cadastrada.
    */
-  void revoke(in string entityId, in InterfaceIdentifier ifaceId)
-    raises (AuthorizationDoesNotExist, ServiceFailure);
+  boolean revoke(in string entityId, in InterfaceIdentifier ifaceId)
+    raises (EntityDoesNotExist, InterfaceDoesNotExist, ServiceFailure);
 
   /**
    * \brief Remove a autorização do membro.
    *
    * \param id Identificador do membro.
+   *
+   * \return TRUE caso alguma autorização existente dessa entidade tenha sido
+   *         revogada, ou FALSE se a entidade não possuia nenhuma autorização.
+   *
+   * \exception EntityDoesNotExist Identificador da entidade não está cadastrada.
    */
-  void revokeAll(in string entityId) raises (ServiceFailure);
+  boolean revokeAll(in string entityId)
+    raises (EntityDoesNotExist, ServiceFailure);
 
   /**
-   * \brief Recupera a autorização de um membro.
+   * \brief Recupera as autorizações de uma entidade.
    *
-   * \param id Identificador do membro.
+   * \param entityId Identificador da entidade cadastrada.
    *
-   * \return Autorização do membro.
-   * \exception EntityHasNoAuthorization Entidade não possui autorização.
+   * \return Descrição das autorizações da entidade.
+   *
+   * \exception EntityDoesNotExist Identificador da entidade não está cadastrada.
    */
   EntityAuthorizations getEntityAuthorizations(in string entityId)
     raises (EntityDoesNotExist, ServiceFailure);
