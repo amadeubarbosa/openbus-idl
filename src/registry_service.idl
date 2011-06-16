@@ -228,8 +228,6 @@ exception AuthorizationDoesNotExist {};
 /** \brief Expressão regular inválida. */
 exception InvalidRegularExpression {};
 
-exception EntityHasNoAuthorization {};
-
 /**
  * \brief Interface de gerenciamento de autorizações de serviços.
  *
@@ -243,7 +241,7 @@ interface IManagement {
    *   pelo Serviço de Registro.
    *
    * \param ifaceId Identificador de interface.
-   * \exception InterfaceIdentifierAlreadyExists Identificador já cadastrado.
+   * \exception InterfaceAlreadyExists Identificador já cadastrado.
    */
   void addInterface(in InterfaceIdentifier ifaceId)
     raises (InterfaceAlreadyExists, InvalidInterfaceIdentifier, ServiceFailure);
@@ -283,8 +281,8 @@ interface IManagement {
    *   uma expressão regular inválida.
    */
   void grant(in string entityId, in InterfaceIdentifier ifaceId)
-    raises (EntityDoesNotExist,
-    InterfaceDoesNotExist, InvalidRegularExpression);
+    raises (EntityDoesNotExist, InterfaceDoesNotExist,
+    InvalidRegularExpression, ServiceFailure);
 
   /**
    * \brief Revoga a autorização para exportar a interface.
@@ -301,10 +299,8 @@ interface IManagement {
    * \brief Remove a autorização do membro.
    *
    * \param id Identificador do membro.
-   * \exception EntityHasNoAuthorization Entidade não possui autorização.
    */
-  void revokeAll(in string entityId)
-    raises (EntityHasNoAuthorization, ServiceFailure);
+  void revokeAll(in string entityId) raises (ServiceFailure);
 
   /**
    * \brief Recupera a autorização de um membro.
@@ -315,7 +311,7 @@ interface IManagement {
    * \exception EntityHasNoAuthorization Entidade não possui autorização.
    */
   EntityAuthorizations getEntityAuthorizations(in string entityId)
-    raises (EntityHasNoAuthorization, ServiceFailure);
+    raises (EntityDoesNotExist, ServiceFailure);
 
   /**
    * \brief Recupera todas as autorizações cadastradas.
