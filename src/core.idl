@@ -24,11 +24,8 @@ module core {
  */
 module v1_06 {
 
-/** \brief Representa um identificador universalmente único. */
-typedef string UUID;
-
 /** \brief Representa um identificador único. */
-typedef UUID Identifier;
+typedef string Identifier;
 
 /** \brief Representa uma sequência de bytes. */
 typedef sequence<octet> OctetSeq;
@@ -40,8 +37,6 @@ typedef sequence<boolean> BooleanSeq;
 exception ServiceFailure {
 	string fMessage; /**< \brief Descreve a razão da falha. */
 };
-
-
 
 }; // version
 
