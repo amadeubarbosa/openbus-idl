@@ -23,13 +23,19 @@ typedef Identifier CredentialIdentifier;
 /** \brief Representa uma sequência de identificadores de credenciais. */
 typedef sequence<CredentialIdentifier> CredentialIdentifierList;
 
+/** \brief Representa o identificador de um observador de credencial. */
+typedef Identifier CredentialObserverIdentifier;
+
+/** \brief Representa uma sequência de identificadores de observadores de credenciais. */
+typedef sequence<CredentialObserverIdentifier> CredentialObserverIdentifierList;
+
 /**
  * \brief Representa a credencial de um membro.
  */
 struct Credential {
-  CredentialIdentifier fIdentifier; /**< \brief Identificador único. */
-  string fOwner; /**< \brief Nome da entidade dona. */
-  string fDelegate; /**< \brief Nome da entidade delegada (opcional). */
+  CredentialIdentifier identifier; /**< \brief Identificador único. */
+  string owner; /**< \brief Nome da entidade dona. */
+  string delegate; /**< \brief Nome da entidade delegada (opcional). */
 };
 
 /** \brief Representa uma sequência de credenciais. */
@@ -43,9 +49,9 @@ interface ICredentialObserver {
   /**
    * \brief Notifica que uma credencial foi removida.
    *
-   * \param fCredential A credencial que foi removida.
+   * \param aCredential A credencial que foi removida.
    */
-  void credentialWasDeleted(in Credential fCredential);
+  void credentialWasDeleted(in Credential aCredential);
 };
 
 /** \brief Representa a validade de uma credencial (s). */
@@ -55,145 +61,14 @@ interface ILeaseProvider {
   /**
    * \brief Renova o lease de uma credencial.
    *
-   * \param[in] fCredential A credencial da entidade.
-   * \param[out] fLease O tempo de validade da credencial.
+   * \param[in] aCredential A credencial da entidade.
+   * \param[out] aLease O lease obtido.
    *
    * \return \c true, caso o \c lease seja renovado, ou \c false, caso
    * contrário.
    */
-   boolean renewLease (in Credential fCredential, out Lease fLease);
+   boolean renewLease (in Credential aCredential, out Lease aLease);
 };
-
-exception IncorrectChallengeAnswer {
-	string fEntityName;
-};
-
-interface CertificateAuthenticator {
-  Credential login (in OctetSeq fAnswer, out Lease fLease)
-      raises (IncorrectChallengeAnswer, ServiceFailure);
-  OctetSeq getChallenge () raises (ServiceFailure);
-  oneway void cancel ();
-};
-
-exception InvalidCredential {
-  Credential fCredential;
-};
-
-exception InvalidCredentials {
-  CredentialSeq fCredentialSeq;
-};
-
-exception UnwatchedCredential {
-  Credential fCredential;
-};
-
-exception UnwatchedCredentials {
-  CredentialSeq fCredentialSeq;
-};
-
-exception IncorrectPassword {
-  string fEntityName;
-};
-
-exception InvalidSystemDeployment {
-  string fEntityName;
-};
-
-/**
- * \brief Representa o serviço de controle de acesso.
- */
-interface IAccessControlService {
-  /**
-   * \brief Autentica uma entidade através de um nome e uma senha.
-   *
-   * \param[in] fName O nome.
-   * \param[in] fPassword A senha.
-   * \param[out] fLease O tempo de validade da credencial da entidade.
-   *
-   * \return A credencial da entidade.
-   */
-  Credential loginByPassword (in string fName, in string fPassword,
-      out Lease fLease) raises (IncorrectPassword, ServiceFailure);
-  
-  /**
-   * \brief Autentica uma entidade através de um nome e de uma resposta para um desafio
-   * previamente obtido.
-   *
-   * \param[in] name O nome.
-   * \param[in] answer A reposta para o desafio.
-   * \param[out] aCredential Uma credencial para a entidade.
-   * \param[out] aLease Um lease que define a validade da credencial.
-   *
-   * \return \c true, caso o login seja realizado com sucesso, ou \c false,
-   * caso contrário.
-   *
-   * \see getChallenge
-   */
-  CertificateAuthenticator getCertificateAuthenticator
-    (in string fSystemDeploymentId, out OctetSeq fChallenge)
-    raises (InvalidSystemDeployment, ServiceFailure);
-
-  /**
-   * \brief Efetua o \c logout de uma entidade.
-   *
-   * \param aCredential A credencial da entidade.
-   *
-   * \return \c true, caso o \c logout seja realizado, ou \c false,
-   * caso contrário.
-   */
-  void logout (in Credential fCredential)
-      raises (InvalidCredential, ServiceFailure);
-
-  /**
-   * \brief Verifica se uma determinada credencial está válida.
-   *
-   * \param aCredential A credencial.
-   *
-   * \return \c true, caso a credencial esteja válida, ou \c false,
-   * caso contrário.
-   */
-  boolean isValid (in Credential fCredential) raises (ServiceFailure);
-
-  /**
-   * \brief Verifica a validade de uma sequência de credenciais.
-   *
-   * \param credentials A sequência de credenciais.
-   *
-   * \return Uma sequência indicando para cada credencial se ela é válida
-   * ou não.
-   */
-  BooleanSeq areValid (in CredentialSeq fCredentials) raises (ServiceFailure);
-};
-
-interface CredentialObserver {
-  void watchCredential(in Credential fCredential)
-      raises (InvalidCredential, ServiceFailure);
-  void unwatchCredential(in Credential fCredential)
-      raises (InvalidCredential, UnwatchedCredential, ServiceFailure);
-
-  void watchCredentials(in CredentialSeq fCredentials)
-      raises (InvalidCredentials, ServiceFailure);
-  void unwatchCredentials(in CredentialSeq fCredentials)
-      raises (InvalidCredentials, UnwatchedCredentials, ServiceFailure);
-
-  void unregister() raises (ServiceFailure);
-};
-
-/**
- * \brief ???
- */
-interface IObservable {
-  CredentialObserver registerObserver(in ICredentialObserver fCallback)
-      raises (ServiceFailure);
-};
-
-/*------------------------- Credential Entries ----------------------------*/
-
-/** \brief Representa o identificador de um observador de credencial. */
-typedef Identifier CredentialObserverIdentifier;
-
-/** \brief Representa uma sequência de identificadores de observadores de credenciais. */
-typedef sequence<CredentialObserverIdentifier> CredentialObserverIdentifierList;
 
 /**
  * \brief Representa a entrada completa de uma credencial de um membro.
@@ -208,7 +83,82 @@ struct EntryCredential {
 /** \brief Representa uma sequência de entradas completas de credenciais. */
 typedef sequence<EntryCredential> EntryCredentialSeq;
 
-interface CredentialEntryManagement {
+/**
+ * \brief Representa o serviço de controle de acesso.
+ */
+interface IAccessControlService {
+  /**
+   * \brief Autentica uma entidade através de um nome e uma senha.
+   *
+   * \param[in] name O nome.
+   * \param[in] password A senha.
+   * \param[out] aCredential Uma credencial para a entidade.
+   * \param[out] aLease Um lease que define a validade da credencial.
+   *
+   * \return \c true, caso o login seja realizado com sucesso, ou \c false,
+   * caso contrário.
+   */
+  boolean loginByPassword (in string name, in string password,
+      out Credential aCredential, out Lease aLease);
+
+  /**
+   * \brief Autentica uma entidade através de um nome e de uma resposta para um desafio
+   * previamente obtido.
+   *
+   * \param[in] name O nome.
+   * \param[in] answer A reposta para o desafio.
+   * \param[out] aCredential Uma credencial para a entidade.
+   * \param[out] aLease Um lease que define a validade da credencial.
+   *
+   * \return \c true, caso o login seja realizado com sucesso, ou \c false,
+   * caso contrário.
+   *
+   * \see getChallenge
+   */
+  boolean loginByCertificate (in string name, in OctetSeq answer,
+      out Credential aCredential, out Lease aLease);
+
+  /**
+   * \brief Obtém um desafio para uma entidade.
+   *
+   * \param name O nome da entidade.
+   *
+   * \return O desafio.
+   *
+   * \see loginByCertificate
+   */
+  OctetSeq getChallenge(in string name);
+
+  /**
+   * \brief Efetua o \c logout de uma entidade.
+   *
+   * \param aCredential A credencial da entidade.
+   *
+   * \return \c true, caso o \c logout seja realizado, ou \c false,
+   * caso contrário.
+   */
+  boolean logout (in Credential aCredential);
+
+  /**
+   * \brief Verifica se uma determinada credencial está válida.
+   *
+   * \param aCredential A credencial.
+   *
+   * \return \c true, caso a credencial esteja válida, ou \c false,
+   * caso contrário.
+   */
+  boolean isValid (in Credential aCredential);
+
+  /**
+   * \brief Verifica a validade de uma sequência de credenciais.
+   *
+   * \param credentials A sequência de credenciais.
+   *
+   * \return Uma sequência indicando para cada credencial se ela é válida
+   * ou não.
+   */
+  BooleanSeq areValid (in CredentialSeq credentials);
+    
   /**
    * \brief Retorna uma entrada de credencial válida.
    *
@@ -216,13 +166,64 @@ interface CredentialEntryManagement {
    *
    * \return \c a credencial se existente, ou \c nil, caso contrário.
    */
-  EntryCredential getCredentialEntry (in Credential aCredential);
-
+  EntryCredential getEntryCredential (in Credential aCredential);
+        
   /**
    * \brief Retorna todas as entradas de credenciais válidas.
    */
-  EntryCredentialSeq getAllCredentialEntries ();
+  EntryCredentialSeq getAllEntryCredential ();
+   
+  /**
+   * \brief Adiciona um observador de credenciais. Esse observador será
+   * notificado apenas sobre eventos ocorridos numa sequência de credenciais.
+   *
+   * \param observer O observador.
+   * \param someCredentialIdentifiers A sequência de credenciais.
+   *
+   * \return Um identificador para o observador.
+   */
+  CredentialObserverIdentifier addObserver(in ICredentialObserver observer,
+      in CredentialIdentifierList someCredentialIdentifiers);
+
+  /**
+   * \brief Remove um observador de credenciais.
+   *
+   * \param identifier O identificador do observador.
+   *
+   * \return \c true caso o observador tenha sido removido, ou \c false,
+   * caso contrário.
+   */
+  boolean removeObserver(in CredentialObserverIdentifier identifier);
+
+  /**
+   * \brief Adiciona uma credencial à sequência de credenciais nas quais um
+   * determinado observador está interessado.
+   *
+   * \param observerIdentifier O identificador do observador.
+   * \param aCredentialIdentifier O identificador da credencial.
+   *
+   * \return \c true caso a credencial tenha sido adicionada à sequência de
+   * credenciais do observador, ou \c false, caso contrário.
+   */
+  boolean addCredentialToObserver(
+      in CredentialObserverIdentifier observerIdentifier,
+      in CredentialIdentifier aCredentialIdentifier);
+
+  /**
+   * \brief Remove uma credencial da sequência de credenciais nas quais um
+   * determinado observador está interessado.
+   *
+   * \param observerIdentifier O identificador do observador.
+   * \param aCredentialIdentifier O identificador da credencial.
+   *
+   * \return \c true caso a credencial tenha sido removida da sequência de
+   * credenciais do observador, ou \c false, caso contrário.
+   */
+  boolean removeCredentialFromObserver(
+      in CredentialObserverIdentifier observerIdentifier,
+      in CredentialIdentifier aCredentialIdentifier);
 };
+
 
 /*--------------------------------- Sistema -------------------------------*/
 
@@ -234,8 +235,8 @@ interface CredentialEntryManagement {
  * \see SystemDeployment
  */
 struct System {
-  string fId;  /**< \brief Identificar único, no estilo login UNIX */
-  string fDescription; /**< /brief Descrição do sistema */
+  string id;  /**< \brief Identificar único, no estilo login UNIX */
+  string description; /**< /brief Descrição do sistema */
 };
 
 /** \brief Seqüência de sistemas */
@@ -251,7 +252,7 @@ exception SystemAlreadyExists {};
 exception SystemInUse {};
 
 /** \brief Sistema não existe. */
-exception SystemDoesNotExist {};
+exception SystemNonExistent {};
 
 /*------------------------------ Implantação ------------------------------*/
 
@@ -261,17 +262,17 @@ exception SystemDoesNotExist {};
  *   consumindo serviços.
  */
 struct SystemDeployment {
-  string fId;       /**< \brief Identificar único, no estilo login UNIX. */
-  string fSystemId; /**< \brief Identificador do sistema a que esta implantação
+  string id;       /**< \brief Identificar único, no estilo login UNIX. */
+  string systemId; /**< \brief Identificador do sistema a que esta implantação
                          está relacionada. */
-  string fDescription; /**< \brief Descrição da implantação. */
+  string description; /**< \brief Descrição da implantação. */
 };
 
 /** \brief Seqüência de implantações. */
 typedef sequence<SystemDeployment> SystemDeploymentList;
 
 /** \brief Certificado que a implantação utiliza na autenticação. */
-typedef sequence<octet> Certificate;
+typedef sequence<octet> SystemDeploymentCertificate;
 
 /** \brief Certificado inválido */
 exception InvalidCertificate {};
@@ -280,12 +281,12 @@ exception InvalidCertificate {};
 exception SystemDeploymentAlreadyExists {};
 
 /** \brief Implantação de sistema não está cadastrada. */
-exception SystemDeploymentDoesNotExist {};
+exception SystemDeploymentNonExistent {};
 
 /*--------------------------------- Usuário -------------------------------*/
 struct User {
-  string fId;   /**< \brief Identificar único, no estilo login UNIX. */
-  string fName; /**< \brief Nome do usuário. */
+  string id;   /**< \brief Identificar único, no estilo login UNIX. */
+  string name; /**< \brief Nome do usuário. */
 };
 
 /** \brief Seqüência de usuários. */
@@ -295,7 +296,7 @@ typedef sequence<User> UserList;
 exception UserAlreadyExists {};
 
 /** \brief Usuário não está cadastrado. */
-exception UserDoesNotExist {};
+exception UserNonExistent {};
 
 /*------------------------------- IManagement -----------------------------*/
 
@@ -303,6 +304,7 @@ exception UserDoesNotExist {};
  * \brief Interface de gerenciamento de sistemas e implatações.
  */
 interface IManagement {
+
   /** 
    * \brief Cadastra um novo sistema.
    *  
@@ -312,8 +314,8 @@ interface IManagement {
    * \exception SystemAlreadyExists Um sistema com o mesmo identificador
    * já está cadastrado.
    */
-  void addSystem(in string fId, in string fDescription)
-      raises (SystemAlreadyExists, ServiceFailure);
+  void addSystem(in string id, in string description)
+    raises (SystemAlreadyExists);
 
   /** 
    * \brief Remove o sistema do barramento.
@@ -323,12 +325,9 @@ interface IManagement {
    * \param id Identificador do sistema.
    *
    * \exception SystemInUse O sistema possui alguma implantação cadastrada.
-   * \exception SystemDoesNotExist Sistema não cadastrado.
+   * \exception SystemNonExistent Sistema não cadastrado.
    */
-  void removeSystem(in string fId)
-      raises (SystemInUse, SystemDoesNotExist, ServiceFailure);
-  void removeSystemForcefully(in string fId)
-      raises (SystemDoesNotExist, ServiceFailure);
+  void removeSystem(in string id) raises (SystemInUse, SystemNonExistent);
 
   /**
    * \brief Atualiza a descrição do sistema.
@@ -336,17 +335,17 @@ interface IManagement {
    * \param id Identificador do sistema.
    * \param description Nova descrição para o sistema.
    *
-   * \exception SystemDoesNotExist Sistema não cadastrado.
+   * \exception SystemNonExistent Sistema não cadastrado.
    */
-  void setSystemDescription(in string fId, in string fDescription)
-      raises (SystemDoesNotExist, ServiceFailure);
+  void setSystemDescription(in string id, in string description)
+    raises (SystemNonExistent);
 
   /** 
    * \brief Recupera todos os sistemas cadastrados.
    *
    * \return Uma seqüência de sistemas.
    */
-  SystemList getSystems() raises (ServiceFailure);
+  SystemList getSystems();
 
   /** 
    * \brief Recupera um sistema dado o seu identificador.
@@ -354,9 +353,9 @@ interface IManagement {
    * \param id Identificador do sistema.
    *
    * \return Sistema referente ao identificador.
-   * \exception SystemDoesNotExist Sistema não cadastrado.
+   * \exception SystemNonExistent Sistema não cadastrado.
    */
-  System getSystem(in string fId) raises (SystemDoesNotExist, ServiceFailure);
+  System getSystem(in string id) raises (SystemNonExistent);
 
   /*---------------------------- Implantações -------------------------------*/
 
@@ -369,23 +368,22 @@ interface IManagement {
    *
    * \exception SystemDeploymentAlreadyExists Existe outra implantação com
    *   o identificador fornecido.
-   * \exception SystemDoesNotExist Sistema não cadastrado.
+   * \exception SystemNonExistent Sistema não cadastrado.
    * \exception InvalidCertificate Certificado inválido.
    */
-  void addSystemDeployment(in string fId, in string fSystemId,
-      in string fDescription, in Certificate fCertificate)
-      raises (SystemDeploymentAlreadyExists, SystemDoesNotExist,
-      InvalidCertificate, ServiceFailure);
+  void addSystemDeployment(in string id, in string systemId,
+    in string description, in SystemDeploymentCertificate certificate)
+    raises (SystemDeploymentAlreadyExists, SystemNonExistent, InvalidCertificate);
 
   /**
    * \brief Remove uma implantação de sistema.
    *
    * \param id Identificador da implantação.
    *
-   * \exception SystemDeploymentDoesNotExist Implantação não cadastrada.
+   * \exception SystemDeploymentNonExistent Implantação não cadastrada.
    */
-  void removeSystemDeployment(in string fId)
-      raises (SystemDeploymentDoesNotExist, ServiceFailure);
+  void removeSystemDeployment(in string id)
+    raises (SystemDeploymentNonExistent);
 
   /**
    * \brief Altera a descrição da implantação.
@@ -393,10 +391,10 @@ interface IManagement {
    * \param id Identificador da implantação.
    * \param description Nova descrição da implantação.
    *
-   * \exception SystemDeploymentDoesNotExist Implantação não cadastrada.
+   * \exception SystemDeploymentNonExistent Implantação não cadastrada.
    */
-  void setSystemDeploymentDescription(in string fId, in string fDescription)
-      raises (SystemDeploymentDoesNotExist, ServiceFailure);
+  void setSystemDeploymentDescription(in string id, in string description)
+    raises (SystemDeploymentNonExistent);
 
   /**
    * \brief Recupera o certificado da implantação.
@@ -405,10 +403,11 @@ interface IManagement {
    *
    * \return Certificado da implantação.
    *
-   * \exception SystemDeploymentDoesNotExist Implantação não cadastrada.
+   * \exception SystemDeploymentNonExistent Implantação não cadastrada.
+   * \exception SystemCertificateNonExistent Implantação não possui certificado.
    */
-  Certificate getSystemDeploymentCertificate(in string fId)
-      raises (SystemDeploymentDoesNotExist, ServiceFailure);
+  SystemDeploymentCertificate getSystemDeploymentCertificate(in string id)
+    raises (SystemDeploymentNonExistent);
 
   /**
    * \brief Altera o certificado da implantação.
@@ -416,29 +415,29 @@ interface IManagement {
    * \param id Identificador da implantação.
    * \param certificate Novo certificado da implantação.
    *
-   * \exception SystemDeploymentDoesNotExist Implantação não cadastrada.
+   * \exception SystemDeploymentNonExistent Implantação não cadastrada.
    * \exception InvalidSystemCertificate Certificado inválido.
    */
-  void setSystemDeploymentCertificate(in string fId,
-      in Certificate fCertificate)
-      raises (SystemDeploymentDoesNotExist, InvalidCertificate, ServiceFailure);
+  void setSystemDeploymentCertificate(in string id,
+    in SystemDeploymentCertificate certificate)
+    raises (SystemDeploymentNonExistent, InvalidCertificate);
 
   /**
    * \brief Recupera todas implantações cadastradas.
    *
    * \return Uma seqüência com as implantações cadastradas. 
    */
-  SystemDeploymentList getSystemDeployments() raises (ServiceFailure);
+  SystemDeploymentList getSystemDeployments();
 
   /**
    * \brief Recupera a implantação dado o seu identificador.
    *
    * \return Retorna a implantação referente ao identificador.
    *
-   * \exception SystemDeploymentDoesNotExist Implantação não cadastrada.
+   * \exception SystemDeploymentNonExistent Implantação não cadastrada.
    */
-  SystemDeployment getSystemDeployment(in string fId)
-      raises (SystemDeploymentDoesNotExist, ServiceFailure);
+  SystemDeployment getSystemDeployment(in string id)
+    raises (SystemDeploymentNonExistent);
 
   /**
    * \brief Recupera todas as implantações de um dado sistema.
@@ -447,10 +446,9 @@ interface IManagement {
    *
    * \return Seqüência com as implantações referentes ao sistema informado.
    *
-   * \exception SystemDoesNotExist Sistema informado não está cadastrado.
+   * \exception SystemNonExistent Sistema informado não está cadastrado.
    */
-  SystemDeploymentList getSystemDeploymentsBySystemId(in string fSystemId)
-      raises(SystemDoesNotExist, ServiceFailure);
+  SystemDeploymentList getSystemDeploymentsBySystemId(in string systemId);
 
   /**
    * \brief Cadastra um novo usuário no barramento.
@@ -461,17 +459,16 @@ interface IManagement {
    * \exception UserAlreadyExists Existe outro usuário com
    *   o identificador fornecido.
    */
-  void addUser(in string fId, in string fName)
-      raises (UserAlreadyExists, ServiceFailure);
+  void addUser(in string id, in string name) raises (UserAlreadyExists);
 
   /**
    * \brief Remove um usuário do barramento.
    *
    * \param id Identificador do usuário.
    *
-   * \exception UserDoesNotExist Usuário não cadastrado.
+   * \exception UserNonExistent Usuário não cadastrado.
    */
-  void removeUser(in string fId) raises (UserDoesNotExist, ServiceFailure);
+  void removeUser(in string id) raises (UserNonExistent);
 
   /**
    * \brief Altera o nome do usuário.
@@ -479,26 +476,26 @@ interface IManagement {
    * \param id Identificador do usuário.
    * \param name Novo nome do usuário.
    *
-   * \exception UserDoesNotExist Usuário não cadastrado.
+   * \exception UserNonExistent Usuário não cadastrado.
    */
-  void setUserName(in string fId, in string fName)
-      raises (UserDoesNotExist, ServiceFailure);
+  void setUserName(in string id, in string name) raises (UserNonExistent);
 
   /**
    * \brief Recupera o usuário, dado o seu identificador.
    *
    * \return Retorna o usuário.
    *
-   * \exception UserDoesNotExist Usuário não cadastrado.
+   * \exception UserNonExistent Usuário não cadastrado.
    */
-  User getUser(in string fId) raises (UserDoesNotExist, ServiceFailure);
+  User getUser(in string id) raises (UserNonExistent);
 
   /**
    * \brief Recupera todos os usuários cadastrados.
    *
    * \return Uma seqüência com os usuários.
    */
-  UserList getUsers() raises (ServiceFailure);
+  UserList getUsers();
+
 };
 
 }; // access_control_service
