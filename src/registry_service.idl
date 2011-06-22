@@ -157,9 +157,7 @@ interface IRegistryService {
    */
   ServiceOfferList findByCriteria (in FacetList fFacets,
       in PropertyList fCriteria) raises (ServiceFailure);
-};
 
-interface ServiceOfferEntryManagement {
   /**
    * \brief Realiza uma busca por ofertas através de uma lista de facetas e 
    *   critérios, se forem especificados.
@@ -173,7 +171,8 @@ interface ServiceOfferEntryManagement {
    *
    * \return As entradas das ofertas encontradas.
    */
-  ServiceOfferEntryList localFind (in FacetList facets, in PropertyList criteria);
+  ServiceOfferEntryList localFind (in FacetList facets, in PropertyList criteria)
+      raises (ServiceFailure);
 };
 
 /*----------------------------- Interface ------------------------------*/
