@@ -119,7 +119,7 @@ interface IRegistryService {
     /**
      * \brief Realiza uma busca por ofertas através de uma lista de facetas.
      *
-     *   Serão selecionadas as ofertas de serviços que implementam todas as 
+     *   Serão selecionadas as ofertas de serviços que implementam todas as
      *   facetas descritas em facets.
      *
      * \param facets As facetas da busca.
@@ -130,9 +130,9 @@ interface IRegistryService {
 
     /**
      * \brief Realiza uma busca por ofertas através de uma lista de facetas e critérios.
-     * 
-     *   Serão selecionadas as ofertas de serviços que implementam todas as 
-     *   facetas descritas em facets, e, que satisfaçam aos critérios 
+     *
+     *   Serão selecionadas as ofertas de serviços que implementam todas as
+     *   facetas descritas em facets, e, que satisfaçam aos critérios
      *   especificados.
      *
      * \param facets As facetas da busca.
@@ -141,14 +141,14 @@ interface IRegistryService {
      * \return As ofertas encontradas.
      */
     ServiceOfferList findByCriteria (in FacetList facets, in PropertyList criteria);
-    
-    
+
+
     /**
-     * \brief Realiza uma busca por ofertas através de uma lista de facetas e 
+     * \brief Realiza uma busca por ofertas através de uma lista de facetas e
      *   critérios, se forem especificados.
-     * 
-     *   Serão selecionadas as ofertas de serviços que implementam todas as 
-     *   facetas descritas em facets, e, que satisfaçam aos critérios 
+     *
+     *   Serão selecionadas as ofertas de serviços que implementam todas as
+     *   facetas descritas em facets, e, que satisfaçam aos critérios
      *   (propriedades) especificados.
      *
      * \param facets As facetas da busca.
@@ -181,9 +181,6 @@ exception InterfaceIdentifierAlreadyExists {};
 
 /*---------------------------- Autorização -----------------------------*/
 
-/** \brief Tempo em (\b milissegundos) desde 1 de janeiro de 1970. */
-typedef long TimeStamp;
-
 /** Tipo da autorização */
 enum AuthorizationType { ATUser, ATSystemDeployment };
 
@@ -204,7 +201,6 @@ struct ServiceOfferInterface {
   RegistryIdentifier id;              /**< Identificar da oferta */
   string member;                      /**< Identificador do membro que efetuou o registro */
   InterfaceIdentifierList interfaces; /**< Interfaces não autorizadas */
-  TimeStamp registrationDate; /**< Data de registro da oferta */ 
 };
 
 typedef sequence<ServiceOfferInterface> ServiceOfferInterfaceList;
@@ -333,7 +329,7 @@ interface IManagement {
   ServiceOfferInterfaceList getOfferedInterfaces();
 
   /**
-   * \brief Recupera todas as interfaces oferecidas no registro por 
+   * \brief Recupera todas as interfaces oferecidas no registro por
    * um dado membro.
    *
    * \param member Identificador do membro do barramento.
@@ -343,12 +339,30 @@ interface IManagement {
   ServiceOfferInterfaceList getOfferedInterfacesByMember(in string member);
 
   /**
+   * \brief Recupera as interfaces oferecidas no registro, mas que os membros
+   * não possuem autorização para ofertá-las.
+   *
+   * \return Seqüência de interfaces não autorizadas aos membros.
+   */
+  ServiceOfferInterfaceList getUnauthorizedInterfaces();
+
+  /**
+   * \brief Recupera as interfaces oferecidas no registro, mas que o dado membro
+   * não possui autorização para ofertá-las.
+   *
+   * \param member Identificador do membro do barramento.
+   *
+   * \return Seqüência de interfaces não autorizadas ao membro.
+   */
+  ServiceOfferInterfaceList getUnauthorizedInterfacesByMember(in string member);
+
+  /**
    * \brief Remove a oferta indicado do registro.
    *
    * Esta operação tem a mesma funcionalidade da oferecida pela interface IRegistryService,
    * mas esta é permitida apenas aos administradores, enquanto a aquela é destinada ao
    * membro que efetuou o registro.
-   * 
+   *
    * \param id Identificador da oferta no registro.
    *
    * \return \c true se a oferta foi removida com sucesso, \c false caso contrário.
