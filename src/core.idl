@@ -22,7 +22,7 @@ module core {
 /**
  * \brief Módulo de versionamento dos Serviços Básicos do OpenBus.
  */
-module v1_06 {
+module v1_05 {
 
 /** \brief Representa um identificador universalmente único. */
 typedef string UUID;

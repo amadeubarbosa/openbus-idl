@@ -10,7 +10,7 @@ module openbus {
 
 module core {
 
-module v1_06 {
+module v1_05 {
 
 /**
  * \brief Módulo do Serviço de Controle de Acesso.

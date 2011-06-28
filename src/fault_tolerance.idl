@@ -13,7 +13,7 @@ module fault_tolerance {
 /**
  * \brief Módulo de versionamento do Serviço Tolerante a Falhas.
  */
-module v1_06 {
+module v1_05 {
 
 /**
  * \brief Representa o serviço tolerante a falhas.
