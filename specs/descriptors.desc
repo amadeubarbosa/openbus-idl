@@ -2,7 +2,7 @@ descriptors = {
   { name = "idl",
     directory = SVNDIR,
     install_files = {
-      ["src/*.idl"] = "idlpath/v1_05",
+      ["src/*.idl"] = "idl/openbus_v1_05",
     },
   },
   { name = "jacorb-2.3.0",
@@ -25,8 +25,8 @@ descriptors = {
       src = SVNDIR,
     },
     install_files = {
-      ["target/openbus-idl-jacorb-*.jar"] = "libpath/java",
-      ["target/dependency/*.jar"] = "libpath/java",
+      ["target/openbus-idl-jacorb-*.jar"] = "lib",
+      ["target/dependency/*.jar"] = "lib",
     },
   },
 }
