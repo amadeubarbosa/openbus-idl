@@ -5,14 +5,14 @@
   <groupId>tecgraf.openbus</groupId>
   <artifactId>openbus-idl-jacorb</artifactId>
   <packaging>jar</packaging>
-  <version>1.5-INSTR08</version>
+  <version>1.5-INSTR</version>
 
   <name>OpenBus IDL JacORB</name>
   <url>https://subversion.tecgraf.puc-rio.br/engdist/openbus/idl/branches/OB_IDL_v1_05_2010_05_13</url>
 
   <properties>
     <java.version>1.5</java.version>
-    <scsinstr.version>0.8-INSTR</scsinstr.version>
+    <scsinstr.version>1.0-INSTR</scsinstr.version>
     <jacorb.version>2.3.0</jacorb.version>
     <source.encoding>ISO-8859-1</source.encoding>
   </properties>
