@@ -1,0 +1,365 @@
+#ifndef __TECGRAF_OPENBUS_CORE_ACCESS_CREDENTIAL_SERVICE_IDL__
+#define __TECGRAF_OPENBUS_CORE_ACCESS_CREDENTIAL_SERVICE_IDL__
+
+#include "core.idl"
+
+module tecgraf {
+
+module openbus {
+
+module core {
+
+module v2_00 {
+
+module services {
+
+/**
+ * \brief Módulo do Serviço de Autenticação.
+ */
+module access_control {
+
+//const string CertificateRegistryFacet = "CertificateRegistry" + Version;
+//const string AccessControlFacet = "AccessControl" + Version;
+//const string LoginRegistryFacet = "LoginRegistry" + Version;
+
+/****************************************************************************/
+/* Faceta de Gerência de Certificados de Entidades **************************/
+/****************************************************************************/
+
+/** \brief Certificado que utilizado na autenticação de entidades. */
+typedef sequence<octet> EntityCertificate;
+
+
+
+/** \brief Indica que não existe certificado associado a entidade. */
+exception MissingCertificate { Identifier entity; };
+
+/** \brief Indica que o certificado fornecido é inválido */
+exception InvalidCertificate { string message; };
+
+
+
+/**
+ * \brief Gerência de credenciais de entidades logadas no barramento.
+ */
+interface CertificateRegistry {
+	/**
+	 * \brief Registra um certificado que pode ser usado para autenticar uma
+	 *        dada entidade no barramento.
+	 *
+	 * \param entity Ident. da entidade a qual o certificado será associado.
+	 * \param certificate Certificado a ser associado a entidade.
+	 *
+	 * \exception InvalidCertificate Certificado fornecido é inválido.
+	 */
+	void registerCertificate(in Identifier entity, in EntityCertificate cert)
+		raises (InvalidCertificate, ServiceFailure);
+	
+	/**
+	 * \brief Obtém o certificado associado a uma dada entidade no barramento.
+	 *
+	 * \param entity Ident. da entidade a qual o certificado será associado.
+	 * 
+	 * \return certificate Certificado a ser associado a entidade.
+	 *
+	 * \exception MissingCertificate Certificado não encontrado.
+	 */
+	EntityCertificate getCertificate(in Identifier entity)
+		raises (MissingCertificate, ServiceFailure);
+	
+	/**
+	 * \brief Remove um certificado associado a uma entidade.
+	 *
+	 * \param entity Ident. da entidade a qual o certificado está associado.
+	 */
+	void removeCertificate(in Identifier entity) raises (ServiceFailure);
+};
+
+/****************************************************************************/
+/* Faceta de Gerência de Credenciais de Entidades Logadas no Barramento *****/
+/****************************************************************************/
+
+/** \brief Dados secretos do login de uma entidade no barramento. */
+struct EntityLogin {
+	Identifier id; /**< \brief Identificador da login. */
+	Identifier entity; /**< \brief Identificador da entidade que fez login. */
+};
+
+/** \brief Representa o tempo de validade de um login (em segundos). */
+typedef unsigned long ValidityTime;
+typedef sequence<ValidityTime> ValidityTimeSeq;
+
+
+
+/** \brief Indica que um dado não foi codificado com a chave do barramento. */
+exception WrongEncoding {};
+
+/** \brief Indica que o acesso ao barramento foi negado sem justificaiva. */
+exception AccessDenied {};
+
+
+
+/**
+ * \brief Interface para conclusão da etapa final do procedimento de login
+ *        por certificado.
+ */
+interface LoginByCertificate {
+	/**
+	 * \brief Autentica a entidade mediante fornecimento de uma resposta correta
+	 *        a um desafio fornecido previamente.
+	 *
+	 * \param answer Reposta ao desafio que deve ser o exato dado decodificado
+	 *               do atributo 'challenge' codificado com a chave pública do
+	 *               certificado do serviço de login.
+	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
+	 *                 ativo sem necessidade de renovação.
+	 *
+	 * \return Informações secretas do login da entidade.
+	 *
+	 * \exception WrongEncoding A autenticação falhou, pois a resposta ao
+	 *                          desafio não foi codificada corretamente
+	 *                          com a chave pública do barramento.
+	 * \exception AccessDenied A autenticação falhou, pois o dado codificado na
+	 *                         resposta ao desafio não é o esperado.
+	 */
+	EntityLogin login(in OctetSeq answer, out ValidityTime validity)
+		raises (WrongEncoding, AccessDenied, ServiceFailure);
+	
+	/** \brief Cancela o processo de login por certificado. */
+	oneway void cancel();
+};
+
+/**
+ * \brief Gerência de credenciais de entidades logadas no barramento.
+ */
+interface AccessControl {
+	readonly attribute OctetSeq certificate;
+	
+	/**
+	 * \brief Autentica uma entidade através de uma senha.
+	 *
+	 * \param entity Identificador da entidade a ser autenticada.
+	 * \param password A senha da entidade codificada com a chave do barramento.
+	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
+	 *                 ativo sem necessidade de renovação.
+	 *
+	 * \return Informações secretas do login da entidade.
+	 *
+	 * \exception WrongEncoding A autenticação falhou, pois a senha não foi
+	 *                          codificada corretamente com a chave pública do
+	 *                          barramento.
+	 * \exception AccessDenied A autenticação falhou. Isso indica que nenhum
+	 *                         validador de senha configurado no serviço de
+	 *                         login validou a senha fornecida para a entidade
+	 *                         indicada.
+	 */
+	EntityLogin loginByPassword(in Identifier entity, in OctetSeq password,
+	                            out ValidityTime validity)
+		raises (WrongEncoding, AccessDenied, ServiceFailure);
+	
+	/**
+	 * \brief Inicia o processo de login por certificado e cria um objeto para
+	 * conclusão desse processo.
+	 *
+	 * O objeto criado para conclusão do processo de login só pode ser utilizado
+	 * para concluir uma único login. Após da conclusão do login (com sucesso ou
+	 * falha), o objeto fica inválido. O objeto criado também pode ficar
+	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
+	 * processo de login por certificado chamando essa operação novamente.
+	 *
+	 * \param entity Identificador da entidade cujo certificado será usado.
+	 * \param challenge Desafio a ser decodificado com a chave privada da
+	 *                  entidade.
+	 *
+	 * \return Objeto a ser usado efetuar o login e obter da credencial.
+	 * 
+	 * \exception MissingCertificate Certificado não encontrado.
+	 */
+	LoginByCertificate startLoginByCertificate(in Identifier entity,
+	                                           out OctetSeq challenge)
+		raises (MissingCertificate, ServiceFailure);
+
+	/**
+	 * \brief Encerra o login de quem chama a operação.
+	 */
+	void logout() raises (ServiceFailure);
+	
+	/**
+	 * \brief Renova a validade do login de quem chama a operação.
+	 *
+	 * \return Valor indicando o tempo mínimo (em segundos) pelo qual o login
+	 *         permanecerá válido sem necessidade de renovação.
+	 */
+	ValidityTime renew() raises (ServiceFailure);
+};
+
+/****************************************************************************/
+/* Faceta de Notificação de Eventos de Credenciais de Autenticação **********/
+/****************************************************************************/
+
+/** \brief Informações públicas do login de uma entidade no barramento. */
+struct LoginInfo {
+	Identifier id; /**< \brief Identificador da login. */
+	Identifier entity; /**< \brief Identificador da entidade que fez login. */
+};
+typedef sequence<LoginInfo> LoginInfoSeq;
+
+
+
+/** \brief Indica que os seguintes logins são inválidos. */
+exception InvalidLogins { IdentifierSeq loginIds; };
+
+
+
+/**
+ * \brief Interface a ser implementada por um observador de logins. Esse
+ *        observador será notificado quando algum dos logins que ele observa
+ *        for invalidado (logout).
+ */
+interface LoginObserver {
+	/**
+	 * \brief Notifica que um login observado foi invalidado.
+	 *
+	 * \param login Informações do login invalidado.
+	 */
+	void entityLogout(in LoginInfo login);
+};
+
+/**
+ * \brief Gerência de logins observados por um observador registrado.
+ */
+interface LoginObserverSubscription {
+	
+	/**
+	 * \brief Adiciona um login à lista de logins observadas.
+	 *
+	 * \param loginId Identificador do login a ser observado.
+	 *
+	 * \return \c true se o login indicado é válido e passa a ser observado ou
+	 *         \c false se o login fornecido é inválido e por essa razão não
+	 *         pode ser observado.
+	 */
+	boolean watchLogin(in Identifier loginId) raises (ServiceFailure);
+	
+	/**
+	 * \brief Remove um login da lista de logins observadas.
+	 *
+	 * Se o login informado não estiver na lista de logins observadas (inclusive
+	 * logins inválidas) essa operação não tem efeito algum.
+	 *
+	 * \param loginId Identificador do login a ser removido.
+	 */
+	void forgetLogin(in Identifier loginId) raises (ServiceFailure);
+	
+	/**
+	 * \brief Adiciona uma sequência de logins à lista de logins observados.
+	 *
+	 * \param loginIds Uma sequência de identificadores de logins a serem
+	 *                 observadas.
+	 *
+	 * \exception InvalidLogins Indica que alguns dos logins a serem observados
+	 *                          são inválidos.
+	 */
+	void watchLogins(in IdentifierSeq loginIds)
+		raises (InvalidLogins, ServiceFailure);
+	
+	/**
+	 * \brief Remove uma sequência de logins da lista de logins observados.
+	 *
+	 * Os logins da sequência que não estiverem na lista de logins observadas
+	 * são ignorados (isso inclui credenciais inválidas).
+	 *
+	 * \param loginIds Uma sequência de identificadores de logins a serem
+	 *                 removidos.
+	 */
+	void forgetLogins(in IdentifierSeq loginIds) raises (ServiceFailure);
+	
+	/**
+	 * \brief Obtem uma sequência dos logins observados por esse observador.
+	 *
+	 * \return A sequência logins observadas.
+	 */
+	LoginInfoSeq getWatchedLogins();
+	
+	/**
+	 * \brief Remove a inscrição desse observador, fazendo com que mais nenhum
+	 *        evento sobre os logins observadas seja mais notificado.
+	 */
+	void remove() raises (ServiceFailure);
+};
+
+interface LoginRegistry {
+	/**
+	 * \brief Devolve uma lista de todos os logins ativos no barramento.
+	 *
+	 * \return Lista de informações de todos os logins ativos no barramento.
+	 */
+	LoginInfoSeq getAllLogins() raises (ServiceFailure);
+	
+	/**
+	 * \brief Devolve uma lista de todos os logins ativos de uma entidade.
+	 *
+	 * \param entity Identificador de uma entidade.
+	 * 
+	 * \return Lista de informações de todos os logins ativos da entidade.
+	 */
+	LoginInfoSeq getEntityLogins(in Identifier entity) raises (ServiceFailure);
+	
+	/**
+	 * \brief Encerra um login no barramento.
+	 *
+	 * \param loginId Identificador do login a ser encerrado.
+	 * 
+	 * \return \c true se o login informado está válido e foi invalidado, ou
+	 *         \c false se o login informado não é válido.
+	 */
+	boolean terminateLogin(in Identifier loginId) raises (ServiceFailure);
+	
+	/**
+	 * \brief Devolve informações de um login válido.
+	 *
+	 * \param loginId Identificador do logins sendo consultado.
+	 *
+	 * \exception InvalidLogins Indica que o login informado é inválido.
+	 */
+	LoginInfo getLoginInfo(in Identifier loginId)
+		raises (InvalidLogins, ServiceFailure);
+	
+	/**
+	 * \brief Verifica a validade de uma sequência de logins.
+	 *
+	 * \param loginIds Sequência de identificadores de logins sendo consultados.
+	 *
+	 * \return Uma sequência de valores indicando o tempo mínimo (em segundos)
+	 *         pelo qual cada login da sequência fornecida permanecerá válido
+	 *         sem necessidade de renovação. Caso a validade já tenha expirado,
+	 *         o valor indicado é zero, indicando que o login não é mais válido.
+	 */
+	ValidityTimeSeq getValidity(in IdentifierSeq loginIds)
+		raises (ServiceFailure);
+	
+	/**
+	 * \brief Inscreve um observador para noficação de eventos de logins.
+	 *
+	 * \param callback Objeto de callback a ser utilizado para nofificação
+	 *                     de eventos.
+	 *
+	 * \return Objeto para gerência da inscrição do observador.
+	 */
+	LoginObserverSubscription subscribeObserver(in LoginObserver callback)
+		raises (ServiceFailure);
+};
+
+}; // access_control
+
+}; // services
+
+}; // version
+
+}; // core
+
+}; // openbus
+
+}; // tecgraf
+
+#endif

@@ -1,0 +1,499 @@
+#ifndef __TECGRAF_OPENBUS_CORE_OFFER_REGISTRY_SERVICE_IDL__
+#define __TECGRAF_OPENBUS_CORE_OFFER_REGISTRY_SERVICE_IDL__
+
+/* for the type of object implementing services offered */
+#include "scs.idl"
+#include "core.idl"
+
+module tecgraf {
+
+module openbus {
+
+module core {
+
+module v2_00 {
+
+module services {
+
+/**
+ * \brief Módulo do Serviço de Ofertas.
+ */
+module offer_registry {
+
+//const string OfferRegistryFacet = "OfferRegistry" + Version;
+//const string EntityRegistryFacet = "EntityRegistry" + Version;
+
+/****************************************************************************/
+/* Faceta de Gerência de Ofertas de Serviço *********************************/
+/****************************************************************************/
+
+interface ServiceOffer; /* forward declaration */
+
+
+
+/** \brief Identificação de uma faceta de componente SCS. */
+typedef string FacetName; /* same type of a SCS facet identifier (name) */
+/** \brief Sequência de facetas de componentes SCS. */
+typedef sequence<FacetName> FacetNameSeq;
+
+/** \brief Propriedade que descreve um aspecto de uma oferta de serviço. */
+struct ServiceProperty {
+	string name;
+	string value;
+};
+/** \brief Sequência de propriedades que descrevem uma oferta de serviço. */
+typedef sequence<ServiceProperty> ServicePropertySeq;
+
+/** \brief Referência para um serviço ofertado. */
+typedef scs::core::IComponent OfferedService;
+
+/** \brief Descreve uma oferta de serviço. */
+struct ServiceOfferDesc {
+	OfferedService service_ref; /** \brief Referência para o serviço ofertado. */
+	ServicePropertySeq properties; /** \brief Propriedades do serviço ofertado. */
+	ServiceOffer ref; /** \brief Objeto que representa a oferta de serviço. */
+};
+/** \brief Sequência de descrições de oferta de serviço. */
+typedef sequence<ServiceOfferDesc> ServiceOfferDescSeq;
+
+
+
+/**
+ * \brief Indica que o serviço oferece facetas não autorizadas para a
+ *        entidade que registra a oferta de serviço
+ */
+exception UnauthorizedFacets { FacetNameSeq facets; };
+
+/**
+ * \brief Indica que a lista de propriedades fornecida ao registrar uma
+ *        oferta de serviço inclui propridades inválidas, tais como
+ *        propriedades automáticas (cujo nome começam com 'openbus.').
+ */
+exception IllegalProperties { ServicePropertySeq properties; };
+
+
+
+/**
+ * \brief Representa uma oferta de serviço.
+ */
+interface ServiceOffer {
+	/** \brief Referência para o serviço ofertado. */
+	readonly attribute OfferedService service_ref;
+	
+	/** \brief Lista de propriedades do serviço ofertado. */
+	readonly attribute ServicePropertySeq properties;
+	
+	/** \brief Devolve uma estrutura descrevedo a oferta de serviço. */
+	ServiceOfferDesc describe();
+	
+	/**
+	 * \brief Altera as propriedades do serviço ofertado.
+	 *
+	 * \param properties Novas propriedades da oferta de serviço.
+	 *
+	 * \exception IllegalProperties A lista de propriedades fornecida inclui
+	 *                              propridades inválidas, tais como
+	 *                              propriedades automáticas (cujo nome começam
+	 *                              com 'openbus.').
+	 */
+	void setProperties(in ServicePropertySeq properties)
+		raises (IllegalProperties, ServiceFailure);
+	
+	/** \brief Remove a oferta de serviço. */
+	void remove() raises (ServiceFailure);
+};
+
+/**
+ * \brief Representa o registro de ofertas de serviço.
+ */
+interface OfferRegistry {
+	/**
+	 * \brief Registra uma oferta de serviço.
+	 *
+	 * \param service_ref Referência serviço sendo ofertado.
+	 * \param properties Propriedades do serviço sendo ofertado.
+	 *
+	 * \return Nova oferta de serviço.
+	 *
+	 * \exception UnauthorizedFacets O componente que implementa o serviço
+	 *                               apresenta facetas com interfaces que não
+	 *                               estão autorizadas para a entidade
+	 *                               realizando o registro da oferta de serviço.
+	 * \exception IllegalProperties A lista de propriedades fornecida inclui
+	 *                              propridades inválidas, tais como
+	 *                              propriedades automáticas (cujo nome começam
+	 *                              com 'openbus.').
+	 */
+	ServiceOffer registerService(in OfferedService service_ref,
+	                             in ServicePropertySeq properties)
+		raises (UnauthorizedFacets, IllegalProperties, ServiceFailure);
+	
+	/**
+	 * \brief Busca por ofertas que apresentem um conjunto de propriedades
+	 *        definido.
+	 * 
+	 * Serão selecionadas apenas as ofertas de serviço que apresentem todas as 
+	 * propriedades especificadas. As propriedades utilizadas nas buscas podem
+	 * ser aquelas fornecidas no momento do registro da oferta de serviço, assim
+	 * como as propriedades automaticamente geradas pelo Openbus, listas a
+	 * seguir:
+	 *
+	 * openbus.offer.credential: Ident. da credencial com que a oferta foi registrada
+	 * openbus.offer.entity: Ident. da entidade que registrou a oferta
+	 * openbus.offer.year: Ano em que a oferta foi registrada
+	 * openbus.offer.month: Número do mês em que a oferta foi registrada.
+	 * openbus.offer.day: Dia do mês que a oferta foi registrada.
+	 * openbus.offer.hour: Hora do dia em que a oferta foi registrada.
+	 * openbus.offer.minute: Minuto do dia em que a oferta foi registrada.
+	 * openbus.offer.second: Segundo do dia em que a oferta foi registrada.
+	 * openbus.component.name: Nome do componente SCS que implementa o serviço.
+	 * openbus.component.version.major: Versão maior do componente SCS que implementa o serviço.
+	 * openbus.component.version.minor: Versão menor do componente SCS que implementa o serviço.
+	 * openbus.component.version.patch: Versão de correção do componente SCS que implementa o serviço.
+	 * openbus.component.facet: Nome de faceta oferecida pelo component SCS que implementa o serviço.
+	 * openbus.component.interface: RepID de interface implementada por faceta do component SCS que implementa o serviço.
+	 * 
+	 * \param properties Propriedades que as ofertas de serviços encontradas
+	 *                   devem apresentar.
+	 *
+	 * \return Sequência de descrições de ofertas de serviço encontradas.
+	 */
+	ServiceOfferDescSeq findServices(in ServicePropertySeq properties)
+		raises (ServiceFailure);
+	
+	/**
+	 * \brief 
+	 * 
+	 * \param 
+	 *
+	 * \return 
+	 */
+	ServiceOfferDescSeq getServices(in Identifier entity, in FacetName facet)
+		raises (ServiceFailure);
+};
+
+/****************************************************************************/
+/* Faceta de Gerência de Autorização de Entidades ***************************/
+/****************************************************************************/
+
+interface RegisteredEntity; /* forward declaration */
+interface EntityCategory; /* forward declaration */
+
+
+
+/** \brief Descrição de uma categoria de entidade. */
+struct EntityCategoryDesc {
+	Identifier id;      /** /brief Identificador da categoria. */
+	string name;        /** /brief Nome descritivo da categoria. */
+	EntityCategory ref; /** /brief Objeto que representa a categoria. */
+};
+/** \brief Sequência de descrições de catergorias de entidade. */
+typedef sequence<EntityCategoryDesc> EntityCategoryDescSeq;
+
+/** \brief Descrição de uma entidade registrada. */
+struct RegisteredEntityDesc {
+	EntityCategory category; /** /brief Categoria da entidade. */
+	Identifier id;           /** /brief Identificador da entidade. */
+	string name;             /** /brief Nome descritivo da entidade. */
+	RegisteredEntity ref;    /** /brief Objeto que representa a entidade. */
+};
+/** \brief Sequência de descrições sobre entidades registradas */
+typedef sequence<RegisteredEntityDesc> RegisteredEntityDescSeq;
+
+/** \brief Identificação de uma interface. */
+typedef string InterfaceId; /* same type of interface identifiers of SCS */
+/** \brief Sequência de identificações de interface. */
+typedef sequence<InterfaceId> InterfaceIdSeq;
+
+/**
+ * \brief Definição de interfaces autorizadas.
+ *
+ * A especificação de interfaces é feita na forma de um identificador do
+ * repositório de interfaces de CORBA (repId). Adicionalmente, é possível usar
+ * um asterísco (*) como um caracter curinga para especificar mais de uma
+ * interface. Nesse caso, a especificação deve seguir a seguinte forma similar
+ * ao formato canônico de repId:
+ *   IDL:<idl_path>:<minor_version>.<major_version>.
+ * O caracter curinga pode ser usado ao final da parte '<idl_path>' e nas
+ * partes '<minor_version>' e '<major_version>' para indicar que qualquer
+ * texto naquela parte do repId é válido. Abaixo vão alguns exemplos de uso
+ * desse recurso:
+ *
+ * 'IDL:tecgraf/sample/*:1.0'  : especifica todas as interfaces do módulo
+ *                               'tecgraf::sample' com a versão 1.0.
+ * 'IDL:tecgraf/sample/API:*.*': especifica todas as versões da interface
+ *                               'tecgraf::sample::API'.
+ * 'IDL:tecgraf/sample/API:1.*': especifica todas as versões da interface
+ *                              'tecgraf::sample::API' com versão maior 1.
+ * 'IDL:tecgraf/sample/*:*.*'  : especifica todas as interfaces do módulo
+ *                              'tecgraf::sample' de qualquer versão.
+ * 'IDL:*:*.*'                 : especifica todas as interfaces definidas
+ *                               usando a forma canônica de repId de
+ *                               interfaces descritas em IDL.
+ */
+typedef string AuthorizationSpec;
+/** \brief Sequência de definições de interfaces autorizadas. */
+typedef sequence<AuthorizationSpec> AuthorizationSpecSeq;
+
+
+
+/** \brief Indica que uma entidade com o ident. dado já está registrada. */
+exception EntityAlreadyRegistered { RegisteredEntityDesc existing; };
+
+/** \brief Indica que uma categoria com o ident. dado já existe. */
+exception EntityCategoryAlreadyExists { EntityCategoryDesc existing; };
+
+/** \brief Indica que existe entidades nessa categoria de entidade. */
+exception EntityCategoryInUse { RegisteredEntityDescSeq entities; };
+
+/** \brief Indica que a especificação de interfaces autorizadas é inválida. */
+exception InvalidAuthorizationSpec { AuthorizationSpec authorization; };
+
+/** \brief Indica que uma oferta existente exige a autorização removida. */
+exception AuthorizationInUse { ServiceOfferDescSeq offers; };
+
+
+
+/** 
+ * \brief Representa uma categoria de entidades no barramento.
+ *
+ * Categorias de entidade são agrupamentos usados exclusivamente para
+ * facilitar a gerência das diversas entidades cadastradas no barramento
+ * pelo administrador do sistema.
+ */
+interface EntityCategory {
+	readonly attribute Identifier id; /** /brief Identificador da categoria */
+	readonly attribute string name;   /** /brief Nome descritivo da categoria */
+	
+	/** \brief Devolve uma estrutura descrevedo a categoria de entidade. */
+	EntityCategoryDesc describe();
+	
+	/**
+	 * \brief Altera a descrição da categoria.
+	 *
+	 * \param name Nome descritivo da categoria.
+	 */
+	void setName(in string name) raises (ServiceFailure);
+
+	/** 
+	 * \brief Remove a categoria de entidade.
+	 *
+	 * A categoria só é removida se não existir nenhuma entidade nela.
+	 *
+	 * \exception EntityCategoryInUse A categoria possui alguma entidade.
+	 */
+	void remove() raises (EntityCategoryInUse, ServiceFailure);
+	
+	/** 
+	 * \brief Remove a categoria e todas suas entidades.
+	 *
+	 * Se houver alguma entidade cadastrada nessa categoria  ela também é
+	 * removida.
+	 */
+	void removeAll() raises (ServiceFailure);
+	
+	/**
+	 * \brief Cria uma nova entidade nessa categoria.
+	 *
+	 * \param id Identificador da entidade (deve ser único no barramento).
+	 * \param name Nome descritivo da entidade (texto livre).
+	 *
+	 * \exception EntityAlreadyRegistered Indica que uma entidade com esse
+	 *            identificador já está registrada.
+	 */
+	RegisteredEntity registerEntity(in Identifier id, in string name)
+	  raises (EntityAlreadyRegistered, ServiceFailure);
+	
+	/**
+	 * \brief Recupera todas entidades nessa categoria.
+	 *
+	 * \return Sequência de descrições das entidades nessa categoria. 
+	 */
+	RegisteredEntityDescSeq getEntities() raises (ServiceFailure);
+};
+
+/** 
+ * \brief Representa uma entidade do barramento registrada.
+ *
+ * Entidade é tudo aquilo que pode se logar ao barramento e usufruir dos
+ * recursos do barramento. Em particular, tanto usuários humanos como
+ * implantações de sistema são considerados entidades. Entidades podem ou não
+ * ser cadastradas no serviço. Apenas entidades cadastradas podem ser
+ * autorizadas a ofertar serviços.
+ */
+interface RegisteredEntity {
+	readonly attribute EntityCategory category; /** /brief Categoria da entidade */
+	readonly attribute Identifier id;           /** /brief Identificador da entidade */
+	readonly attribute string name;             /** /brief Nome descritivo da entidade */
+	
+	/** \brief Devolve uma estrutura descrevedo a entidade registrada. */
+	RegisteredEntityDesc describe();
+	
+	/**
+	 * \brief Altera o nome descritivo da entidade.
+	 *
+	 * \param name Nome descritivo da entidade.
+	 */
+	void setName(in string name) raises (ServiceFailure);
+	
+	/** 
+	 * \brief Remove o registro da entidade.
+	 *
+	 * Todas as autorizações e ofertas de serviço da entidade são removidas
+	 * juntamente com a entidade.
+	 */
+	void remove() raises (ServiceFailure);
+	
+	/**
+	 * \brief Associa uma especificação de interfaces autorizadas a entidade.
+	 *
+	 * Todas as interfaces que casarem com essa especificação de interface
+	 * poderão ser implementadas pelos serviços ofertados por essa entidade.
+	 *
+	 * \param interfaces Especificação de interfaces autorizadas a ser
+	 *                   associada a entidade.
+	 *
+	 * \exception InvalidAuthorizationSpec A especificação da interface é
+	 *                                     inválida.
+	 */
+	void addAuthorization(in AuthorizationSpec authorization)
+		raises (InvalidAuthorizationSpec, ServiceFailure);
+	
+	/**
+	 * \brief Remove uma especificação de interfaces autorizadas associda a
+	 *        entidade.
+	 *
+	 * Se a especificação de interfaces autorizadas dada não estiver associada
+	 * à entidade, essa operação não tem efeito algum.
+	 *
+	 * \param interfaces Especificação de interfaces autorizadas a ser
+	 *                   desassociada da entidade.
+	 *
+	 * \exception InvalidAuthorizationSpec A especificação da interface é
+	 *                                     inválida.
+	 * \exception AuthorizationInUse Existem ofertas de serviço dessa entidade
+	 *                               que implementam interfaces referentes a
+	 *                               essa autorização.
+	 */
+	void removeAuthorization(in AuthorizationSpec authorization)
+		raises (InvalidAuthorizationSpec, AuthorizationInUse, ServiceFailure);
+	
+	/**
+	 * \brief Remove uma especificação de interfaces autorizadas associda a
+	 *        entidade juntamente com eventuais ofertas de serviço dessa
+	 *        entidade que foram autorizadas por essa especificação.
+	 *
+	 * Se a especificação de interfaces autorizadas dada não estiver associada
+	 * à entidade, essa operação não tem efeito algum.
+	 *
+	 * \param interfaces Especificação de interfaces autorizadas a ser
+	 *                   desassociada da entidade.
+	 *
+	 * \exception InvalidAuthorizationSpec A especificação da interface é
+	 *                                     inválida.
+	 */
+	void removeAuthorizationAndOffers(in AuthorizationSpec authorization)
+		raises (InvalidAuthorizationSpec, ServiceFailure);
+	
+	/**
+	 * \brief Remove todas as especificações de interfaces autorizadas e
+	 *        offertas da entidade.
+	 */
+	void removeAllAuthorizationsAndOffers() raises (ServiceFailure);
+	
+	/**
+	 * \brief Devolve a lista de especificações de interfaces autorizadas
+	 *        associados a essa entidade.
+	 *
+	 * \return Lista de especificação de interfaces autorizadas.
+	 */
+	AuthorizationSpecSeq getAuthorizationSpecs()
+		raises (ServiceFailure);
+};
+
+/**
+ * \brief Interface de registro de entidades do barramento.
+ */
+interface EntityRegistry {
+	
+	/** 
+	 * \brief Cria uma nova cateroria de entidade no barramento.
+	 *  
+	 * \param id Identificador da categoria (deve ser único no barramento).
+	 * \param name Nome descritivo da categoria (texto livre).
+	 *
+	 * \exception EntityCategoryAlreadyExists Indica que uma categoria com o mesmo
+	 *                                        identificador já está existe.
+	 */
+	EntityCategory createEntityCategory(in Identifier id, in string name)
+		raises (EntityCategoryAlreadyExists, ServiceFailure);
+	
+	/** 
+	 * \brief Recupera todos as categorias de entidade existentes.
+	 *
+	 * \return Uma sequência de descrições das categorias.
+	 */
+	EntityCategoryDescSeq getEntityCategories() raises (ServiceFailure);
+	
+	/** 
+	 * \brief Busca um categoria de entidade pelo seu identificador.
+	 *
+	 * \param id Identificador da categoria a ser buscada.
+	 *
+	 * \return Categoria encontrada com aquele identifcador ou \c null caso não
+	 *         exista nenhuma categoria com o identificador fornecido.
+	 */
+	EntityCategory getEntityCategory(in Identifier id) raises (ServiceFailure);
+	
+	/**
+	 * \brief Obtém todas entidades registradas.
+	 *
+	 * \return Sequência de descrições das entidades registradas.
+	 */
+	RegisteredEntityDescSeq getEntities() raises (ServiceFailure);
+	
+	/**
+	 * \brief Busca uma entidade pelo seu identificador.
+	 *
+	 * \param id Identificador da entidade a ser buscada.
+	 * 
+	 * \return Entidade encontrada com aquele identifcador ou \c null caso não
+	 *         exista nenhuma entidade com o identificador fornecido.
+	 */
+	RegisteredEntity getEntity(in Identifier id) raises (ServiceFailure);
+	
+	/**
+	 * \brief Obtém todas as entidades registradas com alguma autorização de
+	 *        interface associada.
+	 *
+	 * \return Sequência de descrições das entidades encontradas.
+	 */
+	RegisteredEntityDescSeq getAuthorizedEntities() raises (ServiceFailure);
+	
+	/**
+	 * \brief Obtém todas as entidades registradas que tenham autorizações de
+	 *        interface que casem com um conjunto de interfaces fornecido
+	 *
+	 * \param interfaces Sequência de interfaces que as entidades devem estar
+	 *                   autorizadas a fornecer através de serviços.
+	 * 
+	 * \return Sequência de entidades autorizadas a fornecer as interfaces
+	 *         especificadas através de serviços.
+	 */
+	RegisteredEntityDescSeq getEntitiesByAuthorizedInterfaces(
+		in InterfaceIdSeq interfaces) raises (ServiceFailure);
+};
+
+}; // offer_registry
+
+}; // services
+
+}; // version
+
+}; // core
+
+}; // openbus
+
+}; // tecgraf
+
+#endif

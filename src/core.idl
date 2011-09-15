@@ -1,0 +1,53 @@
+/**
+ * \mainpage Documentação da IDL
+ */
+#ifndef __TECGRAF_OPENBUS_CORE_IDL__
+#define __TECGRAF_OPENBUS_CORE_IDL__
+
+/**
+ * \brief Módulo dos sistemas e aplicações do Tecgraf.
+ */
+module tecgraf {
+
+/**
+ * \brief Módulo do \e middleware OpenBus.
+ */
+module openbus {
+
+/**
+ * \brief Módulo dos <b> Serviços Básicos </b> do OpenBus.
+ */
+module core {
+
+/**
+ * \brief Módulo de versionamento dos Serviços Básicos do OpenBus.
+ */
+module v2_00 {
+
+//const string Version = "2_00";
+//const string BusObjectKey = "OpenBus";
+
+/** \brief Representa um identificador único. */
+typedef string Identifier;
+typedef sequence<Identifier> IdentifierSeq;
+
+
+/** \brief Representa uma sequência de bytes. */
+typedef sequence<octet> OctetSeq;
+
+module services {
+	
+	/** \brief Exceção que sinaliza uma falha interna num serviço básico. */
+	exception ServiceFailure { string message; };
+	
+};
+
+}; // version
+
+}; // core
+
+}; // openbus
+
+}; // tecgraf
+
+#endif
