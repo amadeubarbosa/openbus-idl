@@ -69,8 +69,13 @@ exception UnauthorizedFacets { FacetNameSeq facets; };
  *        oferta de serviço inclui propridades inválidas, tais como
  *        propriedades automáticas (cujo nome começam com 'openbus.').
  */
-exception IllegalProperties { ServicePropertySeq properties; };
+exception InvalidProperties { ServicePropertySeq properties; };
 
+/**
+ * \brief Indica que a referência fornecida do serviço não apresenta o formato
+ *        esperado, que no caso é um componente SCS bem formado.
+ */
+exception InvalidService {};
 
 
 /**
@@ -115,18 +120,22 @@ interface OfferRegistry {
 	 *
 	 * \return Nova oferta de serviço.
 	 *
+	 * \exception InvalidService O componente SCS fornecido não é válido, por
+	 *                           não apresentar facetas padrão definidas pelo
+	 *                           modelo de componetes SCS.
+	 * \exception InvalidProperties A lista de propriedades fornecida inclui
+	 *                              propridades inválidas, tais como
+	 *                              propriedades automáticas (cujo nome começam
+	 *                              com 'openbus.').
 	 * \exception UnauthorizedFacets O componente que implementa o serviço
 	 *                               apresenta facetas com interfaces que não
 	 *                               estão autorizadas para a entidade
 	 *                               realizando o registro da oferta de serviço.
-	 * \exception IllegalProperties A lista de propriedades fornecida inclui
-	 *                              propridades inválidas, tais como
-	 *                              propriedades automáticas (cujo nome começam
-	 *                              com 'openbus.').
 	 */
 	ServiceOffer registerService(in OfferedService service_ref,
 	                             in ServicePropertySeq properties)
-		raises (UnauthorizedFacets, IllegalProperties, ServiceFailure);
+		raises (InvalidService, InvalidProperties, UnauthorizedFacets,
+		        ServiceFailure);
 	
 	/**
 	 * \brief Busca por ofertas que apresentem um conjunto de propriedades
@@ -138,9 +147,9 @@ interface OfferRegistry {
 	 * como as propriedades automaticamente geradas pelo Openbus, listas a
 	 * seguir:
 	 *
-	 * openbus.offer.credential: Ident. da credencial com que a oferta foi registrada
-	 * openbus.offer.entity: Ident. da entidade que registrou a oferta
-	 * openbus.offer.year: Ano em que a oferta foi registrada
+	 * openbus.offer.login: Ident. da login com que a oferta foi registrada.
+	 * openbus.offer.entity: Ident. da entidade que registrou a oferta.
+	 * openbus.offer.year: Ano em que a oferta foi registrada.
 	 * openbus.offer.month: Número do mês em que a oferta foi registrada.
 	 * openbus.offer.day: Dia do mês que a oferta foi registrada.
 	 * openbus.offer.hour: Hora do dia em que a oferta foi registrada.
@@ -162,14 +171,11 @@ interface OfferRegistry {
 		raises (ServiceFailure);
 	
 	/**
-	 * \brief 
+	 * \brief Devolve uma lista de todas as ofertas de serviço registradas.
 	 * 
-	 * \param 
-	 *
-	 * \return 
+	 * \return Sequência de descrições de ofertas de serviço registradas.
 	 */
-	ServiceOfferDescSeq getServices(in Identifier entity, in FacetName facet)
-		raises (ServiceFailure);
+	ServiceOfferDescSeq getServices() raises (ServiceFailure);
 };
 
 /****************************************************************************/
