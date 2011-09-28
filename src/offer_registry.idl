@@ -96,13 +96,13 @@ interface ServiceOffer {
 	 *
 	 * \param properties Novas propriedades da oferta de serviço.
 	 *
-	 * \exception IllegalProperties A lista de propriedades fornecida inclui
+	 * \exception InvalidProperties A lista de propriedades fornecida inclui
 	 *                              propridades inválidas, tais como
 	 *                              propriedades automáticas (cujo nome começam
 	 *                              com 'openbus.').
 	 */
 	void setProperties(in ServicePropertySeq properties)
-		raises (IllegalProperties, ServiceFailure);
+		raises (InvalidProperties, ServiceFailure);
 	
 	/** \brief Remove a oferta de serviço. */
 	void remove() raises (ServiceFailure);
@@ -211,36 +211,6 @@ typedef string InterfaceId; /* same type of interface identifiers of SCS */
 /** \brief Sequência de identificações de interface. */
 typedef sequence<InterfaceId> InterfaceIdSeq;
 
-/**
- * \brief Definição de interfaces autorizadas.
- *
- * A especificação de interfaces é feita na forma de um identificador do
- * repositório de interfaces de CORBA (repId). Adicionalmente, é possível usar
- * um asterísco (*) como um caracter curinga para especificar mais de uma
- * interface. Nesse caso, a especificação deve seguir a seguinte forma similar
- * ao formato canônico de repId:
- *   IDL:<idl_path>:<minor_version>.<major_version>.
- * O caracter curinga pode ser usado ao final da parte '<idl_path>' e nas
- * partes '<minor_version>' e '<major_version>' para indicar que qualquer
- * texto naquela parte do repId é válido. Abaixo vão alguns exemplos de uso
- * desse recurso:
- *
- * 'IDL:tecgraf/sample/*:1.0'  : especifica todas as interfaces do módulo
- *                               'tecgraf::sample' com a versão 1.0.
- * 'IDL:tecgraf/sample/API:*.*': especifica todas as versões da interface
- *                               'tecgraf::sample::API'.
- * 'IDL:tecgraf/sample/API:1.*': especifica todas as versões da interface
- *                              'tecgraf::sample::API' com versão maior 1.
- * 'IDL:tecgraf/sample/*:*.*'  : especifica todas as interfaces do módulo
- *                              'tecgraf::sample' de qualquer versão.
- * 'IDL:*:*.*'                 : especifica todas as interfaces definidas
- *                               usando a forma canônica de repId de
- *                               interfaces descritas em IDL.
- */
-typedef string AuthorizationSpec;
-/** \brief Sequência de definições de interfaces autorizadas. */
-typedef sequence<AuthorizationSpec> AuthorizationSpecSeq;
-
 
 
 /** \brief Indica que uma entidade com o ident. dado já está registrada. */
@@ -253,7 +223,7 @@ exception EntityCategoryAlreadyExists { EntityCategoryDesc existing; };
 exception EntityCategoryInUse { RegisteredEntityDescSeq entities; };
 
 /** \brief Indica que a especificação de interfaces autorizadas é inválida. */
-exception InvalidAuthorizationSpec { AuthorizationSpec authorization; };
+exception InvalidInterface { InterfaceId ifaceId; };
 
 /** \brief Indica que uma oferta existente exige a autorização removida. */
 exception AuthorizationInUse { ServiceOfferDescSeq offers; };
@@ -351,61 +321,37 @@ interface RegisteredEntity {
 	void remove() raises (ServiceFailure);
 	
 	/**
-	 * \brief Associa uma especificação de interfaces autorizadas a entidade.
+	 * \brief Autoriza que a entidade possa ofertar serviços que implementem
+	 *        essa interface.
 	 *
-	 * Todas as interfaces que casarem com essa especificação de interface
-	 * poderão ser implementadas pelos serviços ofertados por essa entidade.
+	 * \param ifaceId Identificador da interface a ser autorizada.
 	 *
-	 * \param interfaces Especificação de interfaces autorizadas a ser
-	 *                   associada a entidade.
+	 * \result \c true caso a interface não estava autorizada e passou a ser
+	 *         autorizada ou \c false caso a interface já estava autorizada e
+	 *         a operação não resultou em nenhuma mudança.
 	 *
-	 * \exception InvalidAuthorizationSpec A especificação da interface é
-	 *                                     inválida.
+	 * \exception InvalidInterface A interface é inválida (não está registrada).
 	 */
-	void addAuthorization(in AuthorizationSpec authorization)
-		raises (InvalidAuthorizationSpec, ServiceFailure);
+	boolean grantInterface(in InterfaceId ifaceId)
+		raises (InvalidInterface, ServiceFailure);
 	
 	/**
-	 * \brief Remove uma especificação de interfaces autorizadas associda a
-	 *        entidade.
+	 * \brief Remove a autorização da entidade de ofertar serviços que
+	 *        implementem a interface.
 	 *
-	 * Se a especificação de interfaces autorizadas dada não estiver associada
-	 * à entidade, essa operação não tem efeito algum.
+	 * \param ifaceId Identificador da interface a ser revogada.
 	 *
-	 * \param interfaces Especificação de interfaces autorizadas a ser
-	 *                   desassociada da entidade.
+	 * \result \c true caso a interface estava autorizada e deixou de ser
+	 *         autorizada ou \c false caso a interface já não era autorizada e
+	 *         a operação não resultou em nenhuma mudança.
 	 *
-	 * \exception InvalidAuthorizationSpec A especificação da interface é
-	 *                                     inválida.
+	 * \exception InvalidInterface A interface é inválida (não está registrada).
 	 * \exception AuthorizationInUse Existem ofertas de serviço dessa entidade
 	 *                               que implementam interfaces referentes a
 	 *                               essa autorização.
 	 */
-	void removeAuthorization(in AuthorizationSpec authorization)
-		raises (InvalidAuthorizationSpec, AuthorizationInUse, ServiceFailure);
-	
-	/**
-	 * \brief Remove uma especificação de interfaces autorizadas associda a
-	 *        entidade juntamente com eventuais ofertas de serviço dessa
-	 *        entidade que foram autorizadas por essa especificação.
-	 *
-	 * Se a especificação de interfaces autorizadas dada não estiver associada
-	 * à entidade, essa operação não tem efeito algum.
-	 *
-	 * \param interfaces Especificação de interfaces autorizadas a ser
-	 *                   desassociada da entidade.
-	 *
-	 * \exception InvalidAuthorizationSpec A especificação da interface é
-	 *                                     inválida.
-	 */
-	void removeAuthorizationAndOffers(in AuthorizationSpec authorization)
-		raises (InvalidAuthorizationSpec, ServiceFailure);
-	
-	/**
-	 * \brief Remove todas as especificações de interfaces autorizadas e
-	 *        offertas da entidade.
-	 */
-	void removeAllAuthorizationsAndOffers() raises (ServiceFailure);
+	boolean revokeInterface(in InterfaceId ifaceId)
+		raises (InvalidInterface, AuthorizationInUse, ServiceFailure);
 	
 	/**
 	 * \brief Devolve a lista de especificações de interfaces autorizadas
@@ -413,8 +359,7 @@ interface RegisteredEntity {
 	 *
 	 * \return Lista de especificação de interfaces autorizadas.
 	 */
-	AuthorizationSpecSeq getAuthorizationSpecs()
-		raises (ServiceFailure);
+	InterfaceIdSeq getGrantedInterfaces() raises (ServiceFailure);
 };
 
 /**
@@ -488,6 +433,43 @@ interface EntityRegistry {
 	 */
 	RegisteredEntityDescSeq getEntitiesByAuthorizedInterfaces(
 		in InterfaceIdSeq interfaces) raises (ServiceFailure);
+};
+
+/****************************************************************************/
+/* Faceta de Gerência de Interfaces Autorizadas *****************************/
+/****************************************************************************/
+
+/** \brief Indica que uma interface está autorizada para algumas entidades. */
+exception InterfaceInUse { RegisteredEntityDescSeq entities; };
+
+
+
+interface InterfaceRegistry {
+	/** 
+	 * \brief Registra uma interface autorizada no cadastro.
+	 *
+	 * \param ifaceId Identificador da interface.
+	 *
+	 * \return \c true caso a interface não estava registrada e foi registrada,
+	 *         e \c false caso a interface já estava registrada.
+	 */
+	boolean registerInterface(in InterfaceId ifaceId) raises (ServiceFailure);
+	
+	/** 
+	 * \brief Remove uma interface autorizada do cadastro.
+	 *
+	 * \param ifaceId Identificador da interface.
+	 *
+	 * \return \c true caso a interface estava registrada e foi removida, e
+	 *         \c false caso a interface não estivesse registrada.
+	 */
+	boolean removeInterface(in InterfaceId ifaceId)
+		raises (InterfaceInUse, ServiceFailure);
+	
+	/** 
+	 * \brief Devolve uma lista de todas as interfaces .
+	 */
+	InterfaceIdSeq getInterfaces() raises (ServiceFailure);
 };
 
 }; // offer_registry
