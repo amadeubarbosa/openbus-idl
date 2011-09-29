@@ -453,7 +453,8 @@ interface InterfaceRegistry {
 	 * \return \c true caso a interface não estava registrada e foi registrada,
 	 *         e \c false caso a interface já estava registrada.
 	 */
-	boolean registerInterface(in InterfaceId ifaceId) raises (ServiceFailure);
+	boolean registerInterface(in InterfaceId ifaceId) 
+		raises (InvalidInterface, ServiceFailure);
 	
 	/** 
 	 * \brief Remove uma interface autorizada do cadastro.
