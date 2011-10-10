@@ -133,6 +133,7 @@ interface LoginByCertificate {
  * \brief Gerência de credenciais de entidades logadas no barramento.
  */
 interface AccessControl {
+	readonly attribute Identifier busid;
 	readonly attribute OctetSeq certificate;
 	
 	/**
