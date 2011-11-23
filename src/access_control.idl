@@ -72,7 +72,7 @@ interface CertificateRegistry {
 	 *
 	 * \param entity Ident. da entidade a qual o certificado está associado.
 	 */
-	void removeCertificate(in Identifier entity) raises (ServiceFailure);
+	boolean removeCertificate(in Identifier entity) raises (ServiceFailure);
 };
 
 /****************************************************************************/
