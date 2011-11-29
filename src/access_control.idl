@@ -314,7 +314,7 @@ interface LoginRegistry {
 	 * \return \c true se o login informado está válido e foi invalidado, ou
 	 *         \c false se o login informado não é válido.
 	 */
-	boolean terminateLogin(in Identifier loginId) raises (ServiceFailure);
+	boolean invalidateLogin(in Identifier loginId) raises (ServiceFailure);
 	
 	/**
 	 * \brief Devolve informações de um login válido.
