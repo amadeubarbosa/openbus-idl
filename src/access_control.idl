@@ -80,9 +80,9 @@ interface CertificateRegistry {
 /****************************************************************************/
 
 /** \brief Dados secretos do login de uma entidade no barramento. */
-struct EntityLogin {
-	Identifier id; /**< \brief Identificador da login. */
-	Identifier entity; /**< \brief Identificador da entidade que fez login. */
+struct LoginAuthenticationInfo {
+	OctetSeq hash; /**< \brief Hash da chave pública a ser associada ao login. */
+	OctetSeq data; /**< \brief Senha ou resposta de desafio para  autenticação. */
 };
 
 /** \brief Representa o tempo de validade de um login (em segundos). */
@@ -108,9 +108,13 @@ interface LoginByCertificate {
 	 * \brief Autentica a entidade mediante fornecimento de uma resposta correta
 	 *        a um desafio fornecido previamente.
 	 *
-	 * \param answer Reposta ao desafio que deve ser o exato dado decodificado
-	 *               do atributo 'challenge' codificado com a chave pública do
-	 *               certificado do serviço de login.
+	 * \param pubkey Chaver pública a ser associada ao login para autenticação.
+	 * \param encrypted Estrutura 'LoginAuthenticationInfo' encryptada com a chave
+	 *                  pública do barramento, onde o campo 'hash' contém o hash
+	 *                  da chave pública fornecida no parâmetro 'pubkey' e o campo
+	 *                  'data' comtém a esposta ao desafio que deve ser o exato
+	 *                  dado decodificado do atributo 'challenge' codificado com a
+	 *                  chave pública do certificado do serviço de login.
 	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
 	 *                 ativo sem necessidade de renovação.
 	 *
@@ -122,7 +126,8 @@ interface LoginByCertificate {
 	 * \exception AccessDenied A autenticação falhou, pois o dado codificado na
 	 *                         resposta ao desafio não é o esperado.
 	 */
-	EntityLogin login(in OctetSeq answer, out ValidityTime validity)
+	Identifier login(in OctetSeq pubkey, in OctetSeq encrypted,
+	                 out ValidityTime validity)
 		raises (WrongEncoding, AccessDenied, ServiceFailure);
 	
 	/** \brief Cancela o processo de login por certificado. */
@@ -140,7 +145,11 @@ interface AccessControl {
 	 * \brief Autentica uma entidade através de uma senha.
 	 *
 	 * \param entity Identificador da entidade a ser autenticada.
-	 * \param password A senha da entidade codificada com a chave do barramento.
+	 * \param pubkey Chaver pública a ser associada ao login para autenticação.
+	 * \param encrypted Estrutura 'LoginAuthenticationInfo' encryptada com a chave
+	 *                  pública do barramento, onde o campo 'hash' contém o hash
+	 *                  da chave pública fornecida no parâmetro 'pubkey' e o campo
+	 *                  'data' comtém a senha para autenticação.
 	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
 	 *                 ativo sem necessidade de renovação.
 	 *
@@ -154,8 +163,8 @@ interface AccessControl {
 	 *                         login validou a senha fornecida para a entidade
 	 *                         indicada.
 	 */
-	EntityLogin loginByPassword(in Identifier entity, in OctetSeq password,
-	                            out ValidityTime validity)
+	Identifier loginByPassword(in Identifier entity, in OctetSeq pubkey,
+	                           in OctetSeq encrypted, out ValidityTime validity)
 		raises (WrongEncoding, AccessDenied, ServiceFailure);
 	
 	/**
@@ -202,6 +211,7 @@ interface AccessControl {
 struct LoginInfo {
 	Identifier id; /**< \brief Identificador da login. */
 	Identifier entity; /**< \brief Identificador da entidade que fez login. */
+	OctetSeq pubkey; /**< \brief Chave pública associada ao login. */
 };
 typedef sequence<LoginInfo> LoginInfoSeq;
 
