@@ -2,6 +2,7 @@
 #define __TECGRAF_OPENBUS_CORE_ACCESS_CREDENTIAL_SERVICE_IDL__
 
 #include "core.idl"
+#include "credential.idl"
 
 module tecgraf {
 
@@ -201,6 +202,12 @@ interface AccessControl {
 	 *         permanecerá válido sem necessidade de renovação.
 	 */
 	ValidityTime renew() raises (ServiceFailure);
+	
+	/**
+	 * \brief ???.
+	 */
+	credential::CredentialData signChainFor(in Identifier target)
+		raises (ServiceFailure);
 };
 
 /****************************************************************************/
@@ -211,7 +218,6 @@ interface AccessControl {
 struct LoginInfo {
 	Identifier id; /**< \brief Identificador da login. */
 	Identifier entity; /**< \brief Identificador da entidade que fez login. */
-	OctetSeq pubkey; /**< \brief Chave pública associada ao login. */
 };
 typedef sequence<LoginInfo> LoginInfoSeq;
 
@@ -333,7 +339,7 @@ interface LoginRegistry {
 	 *
 	 * \exception InvalidLogins Indica que o login informado é inválido.
 	 */
-	LoginInfo getLoginInfo(in Identifier loginId)
+	LoginInfo getLoginInfo(in Identifier loginId, out OctetSeq pubkey)
 		raises (InvalidLogins, ServiceFailure);
 	
 	/**
