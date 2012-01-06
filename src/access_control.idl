@@ -140,7 +140,7 @@ interface LoginByCertificate {
  */
 interface AccessControl {
 	readonly attribute Identifier busid;
-	readonly attribute OctetSeq certificate;
+	readonly attribute OctetSeq buskey;
 	
 	/**
 	 * \brief Autentica uma entidade através de uma senha.
