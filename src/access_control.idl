@@ -2,7 +2,6 @@
 #define __TECGRAF_OPENBUS_CORE_ACCESS_CREDENTIAL_SERVICE_IDL__
 
 #include "core.idl"
-#include "credential.idl"
 
 module tecgraf {
 
@@ -82,9 +81,26 @@ interface CertificateRegistry {
 
 /** \brief Dados secretos do login de uma entidade no barramento. */
 struct LoginAuthenticationInfo {
-	OctetSeq hash; /**< \brief Hash da chave pública a ser associada ao login. */
+	HashValue hash; /**< \brief Hash da chave pública a ser associada ao login. */
 	OctetSeq data; /**< \brief Senha ou resposta de desafio para  autenticação. */
 };
+/** \brief Informações públicas do login de uma entidade no barramento. */
+struct LoginInfo {
+	Identifier id; /**< \brief Identificador da login. */
+	Identifier entity; /**< \brief Identificador da entidade que fez login. */
+};
+typedef sequence<LoginInfo> LoginInfoSeq;
+/** \brief Informações sobre uma cadeia de chamada aninhadas no barramento. */
+struct CallChain {
+	Identifier target; /**< \brief Identificador de login a quem a cadeia se destina. */
+	LoginInfoSeq callers; /**< \brief Informações de login das entidades da cadeia. */
+};
+/** \brief Cadeia de chamada assinada pelo barramento. */
+struct SignedCallChain {
+	EncryptedBlock signature; /** \brief Hash de 'encoded' assinado pelo barramento. */
+	OctetSeq encoded; /** \brief estrutura CallChain codificada usando CDR */
+};
+
 
 /** \brief Representa o tempo de validade de um login (em segundos). */
 typedef unsigned long ValidityTime;
@@ -127,7 +143,7 @@ interface LoginByCertificate {
 	 * \exception AccessDenied A autenticação falhou, pois o dado codificado na
 	 *                         resposta ao desafio não é o esperado.
 	 */
-	Identifier login(in OctetSeq pubkey, in OctetSeq encrypted,
+	Identifier login(in OctetSeq pubkey, in EncryptedBlock encrypted,
 	                 out ValidityTime validity)
 		raises (WrongEncoding, AccessDenied, ServiceFailure);
 	
@@ -165,7 +181,7 @@ interface AccessControl {
 	 *                         indicada.
 	 */
 	Identifier loginByPassword(in Identifier entity, in OctetSeq pubkey,
-	                           in OctetSeq encrypted, out ValidityTime validity)
+	                           in EncryptedBlock encrypted, out ValidityTime validity)
 		raises (WrongEncoding, AccessDenied, ServiceFailure);
 	
 	/**
@@ -187,7 +203,7 @@ interface AccessControl {
 	 * \exception MissingCertificate Certificado não encontrado.
 	 */
 	LoginByCertificate startLoginByCertificate(in Identifier entity,
-	                                           out OctetSeq challenge)
+	                                           out EncryptedBlock challenge)
 		raises (MissingCertificate, ServiceFailure);
 
 	/**
@@ -206,22 +222,13 @@ interface AccessControl {
 	/**
 	 * \brief ???.
 	 */
-	credential::CredentialData signChainFor(in Identifier target)
+	SignedCallChain signChainFor(in Identifier target)
 		raises (ServiceFailure);
 };
 
 /****************************************************************************/
 /* Faceta de Notificação de Eventos de Credenciais de Autenticação **********/
 /****************************************************************************/
-
-/** \brief Informações públicas do login de uma entidade no barramento. */
-struct LoginInfo {
-	Identifier id; /**< \brief Identificador da login. */
-	Identifier entity; /**< \brief Identificador da entidade que fez login. */
-};
-typedef sequence<LoginInfo> LoginInfoSeq;
-
-
 
 /** \brief Indica que os seguintes logins são inválidos. */
 exception InvalidLogins { IdentifierSeq loginIds; };

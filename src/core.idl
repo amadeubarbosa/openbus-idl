@@ -31,6 +31,8 @@ module v2_00 {
 typedef string Identifier;
 typedef sequence<Identifier> IdentifierSeq;
 
+typedef octet HashValue[32];
+typedef octet EncryptedBlock[256];
 
 /** \brief Representa uma sequência de bytes. */
 typedef sequence<octet> OctetSeq;
