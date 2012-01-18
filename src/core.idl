@@ -24,8 +24,9 @@ module core {
  */
 module v2_00 {
 
-//const string Version = "2_00";
-//const string BusObjectKey = "OpenBus";
+const string Version = "2_00";
+const string BusEntity = "OpenBus";
+const string BusObjectKey = "OpenBus";
 
 /** \brief Representa um identificador único. */
 typedef string Identifier;

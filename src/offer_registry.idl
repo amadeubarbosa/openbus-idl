@@ -20,8 +20,9 @@ module services {
  */
 module offer_registry {
 
-//const string OfferRegistryFacet = "OfferRegistry" + Version;
-//const string EntityRegistryFacet = "EntityRegistry" + Version;
+const string OfferRegistryFacet = "OfferRegistry_2_00"; // "OfferRegistry" + Version;
+const string EntityRegistryFacet = "EntityRegistry_2_00"; // "EntityRegistry" + Version;
+const string InterfaceRegistryFacet = "InterfaceRegistry_2_00"; // "InterfaceRegistry" + Version;
 
 /****************************************************************************/
 /* Faceta de Gerência de Ofertas de Serviço *********************************/
