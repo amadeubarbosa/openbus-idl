@@ -129,23 +129,22 @@ exception AccessDenied {};
  * \brief Interface para conclusão da etapa final do procedimento de login
  *        por certificado.
  */
-interface LoginByCertificate {
+interface LoginProcess {
 	/**
 	 * \brief Autentica a entidade mediante fornecimento de uma resposta correta
 	 *        a um desafio fornecido previamente.
 	 *
 	 * \param pubkey Chave pública a ser associada ao login.
 	 * \param encrypted Estrutura 'LoginAuthenticationInfo' codificada em CDR e
-		 *                  encriptada com a chave pública do barramento, onde o campo
+	 *                  encriptada com a chave pública do barramento, onde o campo
 	 *                  'hash' contém o hash SHA-256 do parâmetro 'pubkey' e o
 	 *                  campo 'data' contém a resposta ao desafio que deve ser o
 	 *                  exato dado do parâmetro 'challenge' fornecido na criação
-	 *                  deste objeto decodificado com a chave privada
-	 *                  correspondente ao certificado registrado no barramento.
+	 *                  deste objeto decodificado com a chave privada apropriada.
 	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
 	 *                 ativo sem necessidade de renovação.
 	 *
-	 * \return Informações secretas do login da entidade.
+	 * \return Identificador do login estabelecido
 	 *
 	 * \exception WrongEncoding A autenticação falhou, pois a resposta ao
 	 *                          desafio não foi codificada corretamente
@@ -180,7 +179,7 @@ interface AccessControl {
 	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
 	 *                 ativo sem necessidade de renovação.
 	 *
-	 * \return Informações secretas do login da entidade.
+	 * \return Identificador do login estabelecido
 	 *
 	 * \exception WrongEncoding A autenticação falhou, pois a senha não foi
 	 *                          codificada corretamente com a chave pública do
@@ -199,7 +198,7 @@ interface AccessControl {
 	 * conclusão desse processo.
 	 *
 	 * O objeto criado para conclusão do processo de login só pode ser utilizado
-	 * para concluir uma único login. Após da conclusão do login (com sucesso ou
+	 * para concluir um único login. Após da conclusão do login (com sucesso ou
 	 * falha), o objeto fica inválido. O objeto criado também pode ficar
 	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
 	 * processo de login por certificado chamando essa operação novamente.
@@ -212,10 +211,25 @@ interface AccessControl {
 	 * 
 	 * \exception MissingCertificate Certificado não encontrado.
 	 */
-	LoginByCertificate startLoginByCertificate(in Identifier entity,
-	                                           out EncryptedBlock challenge)
+	LoginProcess startLoginByCertificate(in Identifier entity,
+	                                     out EncryptedBlock challenge)
 		raises (MissingCertificate, ServiceFailure);
-
+	
+	/**
+	 * \brief Inicia o processo de login por single sign-on e cria um objeto para
+	 * conclusão desse processo.
+	 *
+	 * O objeto criado para conclusão do processo de login só pode ser utilizado
+	 * para concluir um único login. Após da conclusão do login (com sucesso ou
+	 * falha), o objeto fica inválido. O objeto criado também pode ficar
+	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
+	 * processo de login por certificado chamando essa operação novamente.
+	 *
+	 * \return Objeto a ser usado efetuar o login e obter da credencial.
+	 */
+	LoginProcess startLoginBySingleSignOn(out EncryptedBlock challenge)
+		raises (ServiceFailure);
+	
 	/**
 	 * \brief Encerra o login de quem chama a operação.
 	 */
@@ -230,7 +244,14 @@ interface AccessControl {
 	ValidityTime renew() raises (ServiceFailure);
 	
 	/**
-	 * \brief ???.
+	 * \brief Cria uma nova cadeia de chamadas assinada pelo barramento.
+	 *
+	 * A cadeia criada pode ser usada pelo login identificado pelo parâmetro
+	 * 'target' para se adicionar a uma cadeia original. A cadeia original é
+	 * definida como a cadeia de chamada dentro da qual a chamada de
+	 * 'signChainFor' foi originalmente iniciada.
+	 *
+	 * \param entity Identificador de login que podera se adicionar a cadeia.
 	 */
 	SignedCallChain signChainFor(in Identifier target)
 		raises (ServiceFailure);
