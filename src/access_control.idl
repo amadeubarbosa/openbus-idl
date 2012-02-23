@@ -198,7 +198,7 @@ interface AccessControl {
 	 * conclusão desse processo.
 	 *
 	 * O objeto criado para conclusão do processo de login só pode ser utilizado
-	 * para concluir um único login. Após da conclusão do login (com sucesso ou
+	 * para concluir um único login. Após a conclusão do login (com sucesso ou
 	 * falha), o objeto fica inválido. O objeto criado também pode ficar
 	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
 	 * processo de login por certificado chamando essa operação novamente.
@@ -207,7 +207,7 @@ interface AccessControl {
 	 * \param challenge Desafio a ser decodificado com a chave privada da
 	 *                  entidade.
 	 *
-	 * \return Objeto a ser usado efetuar o login e obter da credencial.
+	 * \return Objeto a ser usado para efetuar o login e obter da credencial.
 	 * 
 	 * \exception MissingCertificate Certificado não encontrado.
 	 */
@@ -220,12 +220,12 @@ interface AccessControl {
 	 * conclusão desse processo.
 	 *
 	 * O objeto criado para conclusão do processo de login só pode ser utilizado
-	 * para concluir um único login. Após da conclusão do login (com sucesso ou
+	 * para concluir um único login. Após a conclusão do login (com sucesso ou
 	 * falha), o objeto fica inválido. O objeto criado também pode ficar
 	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
 	 * processo de login por certificado chamando essa operação novamente.
 	 *
-	 * \return Objeto a ser usado efetuar o login e obter da credencial.
+	 * \return Objeto a ser usado para efetuar o login e obter da credencial.
 	 */
 	LoginProcess startLoginBySingleSignOn(out EncryptedBlock challenge)
 		raises (ServiceFailure);
