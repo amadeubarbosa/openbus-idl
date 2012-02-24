@@ -57,7 +57,8 @@ struct ServiceOfferDesc {
 /** \brief Sequência de descrições de oferta de serviço. */
 typedef sequence<ServiceOfferDesc> ServiceOfferDescSeq;
 
-
+/** \brief Identificador da inscrição de um observador. */
+typedef long Cookie;
 
 /**
  * \brief Indica que o serviço oferece facetas não autorizadas para a
@@ -78,6 +79,38 @@ exception InvalidProperties { ServicePropertySeq properties; };
  */
 exception InvalidService {};
 
+
+/**
+ * \brief Representa um observador de oferta já cadastrada.
+ */
+interface OfferObserver {
+  /**
+	 * \brief Notifica que a oferta observada teve as propriedades atualizadas.
+	 *
+	 * \param offer O descritor da oferta.
+	 */  
+	void propertiesChanged(in ServiceOfferDesc offer);
+
+  /**
+	 * \brief Notifica que a oferta observada foi removida.
+	 *
+	 * \param offers O descritor da oferta.
+	 */
+	void removed(in ServiceOfferDesc offer);
+};
+
+/**
+ * \brief Representa um observador de registro de ofertas.
+ */
+interface OfferRegistrationObserver {
+  /**
+	 * \brief Notifica que uma oferta que atende ao critério de propriedades do 
+	 *        observador foi registrada.
+	 *
+	 * \param offers A oferta registrada que atende ao critério de propriedades.
+	 */
+	void offerRegistered(in ServiceOfferDesc offer);
+};
 
 /**
  * \brief Representa uma oferta de serviço.
@@ -107,6 +140,25 @@ interface ServiceOffer {
 	
 	/** \brief Remove a oferta de serviço. */
 	void remove() raises (ServiceFailure);
+	
+	/**
+	 * \brief Inscreve um observador da oferta.
+	 *
+	 * \param observer O observador.
+	 *
+	 * \return Um identificador da inscrição do observador.
+	 */
+  Cookie subscribe(in OfferObserver observer) raises (ServiceFailure);
+	
+	/**
+	 * \brief Remove a inscrição do observador da oferta.
+	 *
+	 * \param ck O identificador da inscrição do observador.
+	 *
+	 * \return \c true caso o descadastramento do observador foi bem sucedido e 
+	 *         \c false caso contrário.
+	 */
+  boolean unsubscribe(in Cookie ck) raises (ServiceFailure);
 };
 
 /**
@@ -177,6 +229,31 @@ interface OfferRegistry {
 	 * \return Sequência de descrições de ofertas de serviço registradas.
 	 */
 	ServiceOfferDescSeq getServices() raises (ServiceFailure);
+
+	/**
+	 * \brief Inscreve um observador de registro de ofertas que atendem ao 
+	 *        conjunto de propriedades especificadas.
+	 *
+	 * \param observer O observador.
+	 * \param properties Propriedades que as ofertas de serviços registradas
+ 	 *                   devem apresentar para que o observador seja notificado.
+	 *
+	 * \return Um identificador da inscrição do observador.
+	 */
+	Cookie subscribeObserver(in OfferRegistrationObserver observer,
+	                         in ServicePropertySeq properties)
+		raises (ServiceFailure);
+
+	/**
+	 * \brief Remove a inscrição do observador de registro de ofertas.
+	 *
+	 * \param ck O identificador da inscrição do observador.
+	 *
+	 * \return \c true caso o descadastramento do observador foi bem sucedido e 
+	 *         \c false caso contrário.
+	 */
+	boolean unsubscribeObserver(in Cookie ck)
+	  raises (ServiceFailure);
 };
 
 /****************************************************************************/
