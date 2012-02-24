@@ -22,14 +22,19 @@ const string AccessControlFacet = "AccessControl_2_00"; // "AccessControl" + Ver
 const string LoginRegistryFacet = "LoginRegistry_2_00"; // "LoginRegistry" + Version;
 const string CertificateRegistryFacet = "CertificateRegistry_2_00"; // "CertificateRegistry" + Version;
 
-const unsigned long NoLoginCode           = 0x42555300; // 1112888064 "BUS\0"
-const unsigned long InvalidLoginCode      = 0x42555301; // 1112888065 "BUS\1"
-const unsigned long UnverifiedLoginCode   = 0x42555302; // 1112888066 "BUS\2"
-const unsigned long InvalidRemoteCode     = 0x42555303; // 1112888067 "BUS\3"
-const unsigned long DeniedLoginCode       = 0x42555304; // 1112888068 "BUS\4"
-const unsigned long InvalidCredentialCode = 0x42555305; // 1112888079 "BUS\5"
-const unsigned long InvalidChainCode      = 0x42555306; // 1112888070 "BUS\6"
-const unsigned long UnknownBusCode        = 0x42555307; // 1112888071 "BUS\7"
+/* minor codes de CORBA::NO_PERMISSION do protocolo OpenBus: */
+const unsigned long InvalidCredentialCode = 0x42555300; // 1112888068 "BUS\0"
+const unsigned long InvalidChainCode      = 0x42555301; // 1112888067 "BUS\1"
+const unsigned long InvalidLoginCode      = 0x42555302; // 1112888066 "BUS\2"
+const unsigned long UnverifiedLoginCode   = 0x42555303; // 1112888065 "BUS\3"
+const unsigned long UnknownBusCode        = 0x42555304; // 1112888064 "BUS\4"
+
+/* minor codes de CORBA::NO_PERMISSION da biblioteca de acesso do OpenBus */
+const unsigned long NoLoginCode           = 0x425553FF; // 1112888319 "BUS\255"
+const unsigned long InvalidRemoteCode     = 0x425553FE; // 1112888318 "BUS\254"
+
+/* minor codes de CORBA::NO_PERMISSION específicos de aplicação */
+const unsigned long DeniedLoginCode       = 0x425553FD; // 1112888317 "BUS\253"
 
 /****************************************************************************/
 /* Faceta de Gerência de Certificados de Entidades **************************/

@@ -24,16 +24,19 @@ module core {
  */
 module v2_00 {
 
-const string Version = "2_00";
+const octet MajorVersion = 2;
+const octet MinorVersion = 0;
 const string BusEntity = "OpenBus";
 const string BusObjectKey = "OpenBus";
+const unsigned short HashValueSize = 32;
+const unsigned short EncryptedBlockSize = 256;
 
 /** \brief Representa um identificador único. */
 typedef string Identifier;
 typedef sequence<Identifier> IdentifierSeq;
 
-typedef octet HashValue[32];
-typedef octet EncryptedBlock[256];
+typedef octet HashValue[HashValueSize];
+typedef octet EncryptedBlock[EncryptedBlockSize];
 
 /** \brief Representa uma sequência de bytes. */
 typedef sequence<octet> OctetSeq;
