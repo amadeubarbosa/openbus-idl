@@ -35,8 +35,11 @@ const unsigned short EncryptedBlockSize = 256;
 typedef string Identifier;
 typedef sequence<Identifier> IdentifierSeq;
 
-typedef octet HashValue[HashValueSize];
-typedef octet EncryptedBlock[EncryptedBlockSize];
+/** TODO: ajustar o código abaixo depois de corrigir o bug do LuaIDL (OIL-40) */
+//typedef octet HashValue[HashValueSize];
+//typedef octet EncryptedBlock[EncryptedBlockSize];
+typedef octet HashValue[32];
+typedef octet EncryptedBlock[256];
 
 /** \brief Representa uma sequência de bytes. */
 typedef sequence<octet> OctetSeq;
