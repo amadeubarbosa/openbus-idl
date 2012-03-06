@@ -45,10 +45,10 @@ typedef octet EncryptedBlock[256];
 typedef sequence<octet> OctetSeq;
 
 module services {
-	
-	/** \brief Exceção que sinaliza uma falha interna num serviço básico. */
-	exception ServiceFailure { string message; };
-	
+  
+  /** \brief Exceção que sinaliza uma falha interna num serviço básico. */
+  exception ServiceFailure { string message; };
+  
 };
 
 }; // version

@@ -57,36 +57,36 @@ exception InvalidCertificate { string message; };
  * \brief Gerência de credenciais de entidades logadas no barramento.
  */
 interface CertificateRegistry {
-	/**
-	 * \brief Registra um certificado que pode ser usado para autenticar uma
-	 *        dada entidade no barramento.
-	 *
-	 * \param entity Ident. da entidade a qual o certificado será associado.
-	 * \param certificate Certificado a ser associado a entidade.
-	 *
-	 * \exception InvalidCertificate Certificado fornecido é inválido.
-	 */
-	void registerCertificate(in Identifier entity, in EntityCertificate cert)
-		raises (InvalidCertificate, ServiceFailure);
-	
-	/**
-	 * \brief Obtém o certificado associado a uma dada entidade no barramento.
-	 *
-	 * \param entity Ident. da entidade a qual o certificado será associado.
-	 * 
-	 * \return certificate Certificado a ser associado a entidade.
-	 *
-	 * \exception MissingCertificate Certificado não encontrado.
-	 */
-	EntityCertificate getCertificate(in Identifier entity)
-		raises (MissingCertificate, ServiceFailure);
-	
-	/**
-	 * \brief Remove um certificado associado a uma entidade.
-	 *
-	 * \param entity Ident. da entidade a qual o certificado está associado.
-	 */
-	boolean removeCertificate(in Identifier entity) raises (ServiceFailure);
+  /**
+   * \brief Registra um certificado que pode ser usado para autenticar uma
+   *        dada entidade no barramento.
+   *
+   * \param entity Ident. da entidade a qual o certificado será associado.
+   * \param certificate Certificado a ser associado a entidade.
+   *
+   * \exception InvalidCertificate Certificado fornecido é inválido.
+   */
+  void registerCertificate(in Identifier entity, in EntityCertificate cert)
+    raises (InvalidCertificate, ServiceFailure);
+  
+  /**
+   * \brief Obtém o certificado associado a uma dada entidade no barramento.
+   *
+   * \param entity Ident. da entidade a qual o certificado será associado.
+   * 
+   * \return certificate Certificado a ser associado a entidade.
+   *
+   * \exception MissingCertificate Certificado não encontrado.
+   */
+  EntityCertificate getCertificate(in Identifier entity)
+    raises (MissingCertificate, ServiceFailure);
+  
+  /**
+   * \brief Remove um certificado associado a uma entidade.
+   *
+   * \param entity Ident. da entidade a qual o certificado está associado.
+   */
+  boolean removeCertificate(in Identifier entity) raises (ServiceFailure);
 };
 
 /****************************************************************************/
@@ -95,24 +95,24 @@ interface CertificateRegistry {
 
 /** \brief Dados secretos do login de uma entidade no barramento. */
 struct LoginAuthenticationInfo {
-	HashValue hash; /**< \brief Hash da chave pública a ser associada ao login. */
-	OctetSeq data; /**< \brief Senha ou resposta de desafio para  autenticação. */
+  HashValue hash; /**< \brief Hash da chave pública a ser associada ao login. */
+  OctetSeq data; /**< \brief Senha ou resposta de desafio para  autenticação. */
 };
 /** \brief Informações públicas do login de uma entidade no barramento. */
 struct LoginInfo {
-	Identifier id; /**< \brief Identificador da login. */
-	Identifier entity; /**< \brief Identificador da entidade que fez login. */
+  Identifier id; /**< \brief Identificador da login. */
+  Identifier entity; /**< \brief Identificador da entidade que fez login. */
 };
 typedef sequence<LoginInfo> LoginInfoSeq;
 /** \brief Informações sobre uma cadeia de chamada aninhadas no barramento. */
 struct CallChain {
-	Identifier target; /**< \brief Identificador de login a quem a cadeia se destina. */
-	LoginInfoSeq callers; /**< \brief Informações de login das entidades da cadeia. */
+  Identifier target; /**< \brief Identificador de login a quem a cadeia se destina. */
+  LoginInfoSeq callers; /**< \brief Informações de login das entidades da cadeia. */
 };
 /** \brief Cadeia de chamada assinada pelo barramento. */
 struct SignedCallChain {
-	EncryptedBlock signature; /** \brief Hash de 'encoded' assinado pelo barramento. */
-	OctetSeq encoded; /** \brief estrutura CallChain codificada usando CDR */
+  EncryptedBlock signature; /** \brief Hash de 'encoded' assinado pelo barramento. */
+  OctetSeq encoded; /** \brief estrutura CallChain codificada usando CDR */
 };
 
 
@@ -135,131 +135,131 @@ exception AccessDenied {};
  *        por certificado.
  */
 interface LoginProcess {
-	/**
-	 * \brief Autentica a entidade mediante fornecimento de uma resposta correta
-	 *        a um desafio fornecido previamente.
-	 *
-	 * \param pubkey Chave pública a ser associada ao login.
-	 * \param encrypted Estrutura 'LoginAuthenticationInfo' codificada em CDR e
-	 *                  encriptada com a chave pública do barramento, onde o campo
-	 *                  'hash' contém o hash SHA-256 do parâmetro 'pubkey' e o
-	 *                  campo 'data' contém a resposta ao desafio que deve ser o
-	 *                  exato dado do parâmetro 'challenge' fornecido na criação
-	 *                  deste objeto decodificado com a chave privada apropriada.
-	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
-	 *                 ativo sem necessidade de renovação.
-	 *
-	 * \return Identificador do login estabelecido
-	 *
-	 * \exception WrongEncoding A autenticação falhou, pois a resposta ao
-	 *                          desafio não foi codificada corretamente
-	 *                          com a chave pública do barramento.
-	 * \exception AccessDenied A autenticação falhou, pois o dado codificado na
-	 *                         resposta ao desafio não é o esperado.
-	 */
-	LoginInfo login(in OctetSeq pubkey, in EncryptedBlock encrypted,
-	                 out ValidityTime validity)
-		raises (WrongEncoding, AccessDenied, ServiceFailure);
-	
-	/** \brief Cancela o processo de login por certificado. */
-	oneway void cancel();
+  /**
+   * \brief Autentica a entidade mediante fornecimento de uma resposta correta
+   *        a um desafio fornecido previamente.
+   *
+   * \param pubkey Chave pública a ser associada ao login.
+   * \param encrypted Estrutura 'LoginAuthenticationInfo' codificada em CDR e
+   *                  encriptada com a chave pública do barramento, onde o campo
+   *                  'hash' contém o hash SHA-256 do parâmetro 'pubkey' e o
+   *                  campo 'data' contém a resposta ao desafio que deve ser o
+   *                  exato dado do parâmetro 'challenge' fornecido na criação
+   *                  deste objeto decodificado com a chave privada apropriada.
+   * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
+   *                 ativo sem necessidade de renovação.
+   *
+   * \return Identificador do login estabelecido
+   *
+   * \exception WrongEncoding A autenticação falhou, pois a resposta ao
+   *                          desafio não foi codificada corretamente
+   *                          com a chave pública do barramento.
+   * \exception AccessDenied A autenticação falhou, pois o dado codificado na
+   *                         resposta ao desafio não é o esperado.
+   */
+  LoginInfo login(in OctetSeq pubkey, in EncryptedBlock encrypted,
+                   out ValidityTime validity)
+    raises (WrongEncoding, AccessDenied, ServiceFailure);
+  
+  /** \brief Cancela o processo de login por certificado. */
+  oneway void cancel();
 };
 
 /**
  * \brief Gerência de credenciais de entidades logadas no barramento.
  */
 interface AccessControl {
-	readonly attribute Identifier busid;
-	readonly attribute OctetSeq buskey;
-	
-	/**
-	 * \brief Autentica uma entidade através de uma senha.
-	 *
-	 * \param entity Identificador da entidade a ser autenticada.
-	 * \param pubkey Chave pública a ser associada ao login.
-		 * \param encrypted Estrutura 'LoginAuthenticationInfo' codificada em CDR e
-		 *                  encriptada com a chave pública do barramento, onde o campo
-		 *                  'hash' contém o hash SHA-256 do parâmetro 'pubkey' e o
-		 *                  campo 'data' comtém a senha de autenticação.
-	 * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
-	 *                 ativo sem necessidade de renovação.
-	 *
-	 * \return Identificador do login estabelecido
-	 *
-	 * \exception WrongEncoding A autenticação falhou, pois a senha não foi
-	 *                          codificada corretamente com a chave pública do
-	 *                          barramento.
-	 * \exception AccessDenied A autenticação falhou. Isso indica que nenhum
-	 *                         validador de senha configurado no serviço de
-	 *                         login validou a senha fornecida para a entidade
-	 *                         indicada.
-	 */
-	LoginInfo loginByPassword(in Identifier entity, in OctetSeq pubkey,
-	                           in EncryptedBlock encrypted, out ValidityTime validity)
-		raises (WrongEncoding, AccessDenied, ServiceFailure);
-	
-	/**
-	 * \brief Inicia o processo de login por certificado e cria um objeto para
-	 * conclusão desse processo.
-	 *
-	 * O objeto criado para conclusão do processo de login só pode ser utilizado
-	 * para concluir um único login. Após a conclusão do login (com sucesso ou
-	 * falha), o objeto fica inválido. O objeto criado também pode ficar
-	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
-	 * processo de login por certificado chamando essa operação novamente.
-	 *
-	 * \param entity Identificador da entidade cujo certificado será usado.
-	 * \param challenge Desafio a ser decodificado com a chave privada da
-	 *                  entidade.
-	 *
-	 * \return Objeto a ser usado para efetuar o login e obter da credencial.
-	 * 
-	 * \exception MissingCertificate Certificado não encontrado.
-	 */
-	LoginProcess startLoginByCertificate(in Identifier entity,
-	                                     out EncryptedBlock challenge)
-		raises (MissingCertificate, ServiceFailure);
-	
-	/**
-	 * \brief Inicia o processo de login por single sign-on e cria um objeto para
-	 * conclusão desse processo.
-	 *
-	 * O objeto criado para conclusão do processo de login só pode ser utilizado
-	 * para concluir um único login. Após a conclusão do login (com sucesso ou
-	 * falha), o objeto fica inválido. O objeto criado também pode ficar
-	 * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
-	 * processo de login por certificado chamando essa operação novamente.
-	 *
-	 * \return Objeto a ser usado para efetuar o login e obter da credencial.
-	 */
-	LoginProcess startLoginBySingleSignOn(out EncryptedBlock challenge)
-		raises (ServiceFailure);
-	
-	/**
-	 * \brief Encerra o login de quem chama a operação.
-	 */
-	void logout() raises (ServiceFailure);
-	
-	/**
-	 * \brief Renova a validade do login de quem chama a operação.
-	 *
-	 * \return Valor indicando o tempo mínimo (em segundos) pelo qual o login
-	 *         permanecerá válido sem necessidade de renovação.
-	 */
-	ValidityTime renew() raises (ServiceFailure);
-	
-	/**
-	 * \brief Cria uma nova cadeia de chamadas assinada pelo barramento.
-	 *
-	 * A cadeia criada pode ser usada pelo login identificado pelo parâmetro
-	 * 'target' para se adicionar a uma cadeia original. A cadeia original é
-	 * definida como a cadeia de chamada dentro da qual a chamada de
-	 * 'signChainFor' foi originalmente iniciada.
-	 *
-	 * \param entity Identificador de login que podera se adicionar a cadeia.
-	 */
-	SignedCallChain signChainFor(in Identifier target)
-		raises (ServiceFailure);
+  readonly attribute Identifier busid;
+  readonly attribute OctetSeq buskey;
+  
+  /**
+   * \brief Autentica uma entidade através de uma senha.
+   *
+   * \param entity Identificador da entidade a ser autenticada.
+   * \param pubkey Chave pública a ser associada ao login.
+   * \param encrypted Estrutura 'LoginAuthenticationInfo' codificada em CDR e
+   *                  encriptada com a chave pública do barramento, onde o campo
+   *                  'hash' contém o hash SHA-256 do parâmetro 'pubkey' e o
+   *                  campo 'data' comtém a senha de autenticação.
+   * \param validity Tempo mínimo (em segundos) pelo qual o login permanecerá
+   *                 ativo sem necessidade de renovação.
+   *
+   * \return Identificador do login estabelecido
+   *
+   * \exception WrongEncoding A autenticação falhou, pois a senha não foi
+   *                          codificada corretamente com a chave pública do
+   *                          barramento.
+   * \exception AccessDenied A autenticação falhou. Isso indica que nenhum
+   *                         validador de senha configurado no serviço de
+   *                         login validou a senha fornecida para a entidade
+   *                         indicada.
+   */
+  LoginInfo loginByPassword(in Identifier entity, in OctetSeq pubkey,
+                             in EncryptedBlock encrypted, out ValidityTime validity)
+    raises (WrongEncoding, AccessDenied, ServiceFailure);
+  
+  /**
+   * \brief Inicia o processo de login por certificado e cria um objeto para
+   * conclusão desse processo.
+   *
+   * O objeto criado para conclusão do processo de login só pode ser utilizado
+   * para concluir um único login. Após a conclusão do login (com sucesso ou
+   * falha), o objeto fica inválido. O objeto criado também pode ficar
+   * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
+   * processo de login por certificado chamando essa operação novamente.
+   *
+   * \param entity Identificador da entidade cujo certificado será usado.
+   * \param challenge Desafio a ser decodificado com a chave privada da
+   *                  entidade.
+   *
+   * \return Objeto a ser usado para efetuar o login e obter da credencial.
+   * 
+   * \exception MissingCertificate Certificado não encontrado.
+   */
+  LoginProcess startLoginByCertificate(in Identifier entity,
+                                       out EncryptedBlock challenge)
+    raises (MissingCertificate, ServiceFailure);
+  
+  /**
+   * \brief Inicia o processo de login por single sign-on e cria um objeto para
+   * conclusão desse processo.
+   *
+   * O objeto criado para conclusão do processo de login só pode ser utilizado
+   * para concluir um único login. Após a conclusão do login (com sucesso ou
+   * falha), o objeto fica inválido. O objeto criado também pode ficar
+   * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
+   * processo de login por certificado chamando essa operação novamente.
+   *
+   * \return Objeto a ser usado para efetuar o login e obter da credencial.
+   */
+  LoginProcess startLoginBySingleSignOn(out EncryptedBlock challenge)
+    raises (ServiceFailure);
+  
+  /**
+   * \brief Encerra o login de quem chama a operação.
+   */
+  void logout() raises (ServiceFailure);
+  
+  /**
+   * \brief Renova a validade do login de quem chama a operação.
+   *
+   * \return Valor indicando o tempo mínimo (em segundos) pelo qual o login
+   *         permanecerá válido sem necessidade de renovação.
+   */
+  ValidityTime renew() raises (ServiceFailure);
+  
+  /**
+   * \brief Cria uma nova cadeia de chamadas assinada pelo barramento.
+   *
+   * A cadeia criada pode ser usada pelo login identificado pelo parâmetro
+   * 'target' para se adicionar a uma cadeia original. A cadeia original é
+   * definida como a cadeia de chamada dentro da qual a chamada de
+   * 'signChainFor' foi originalmente iniciada.
+   *
+   * \param entity Identificador de login que podera se adicionar a cadeia.
+   */
+  SignedCallChain signChainFor(in Identifier target)
+    raises (ServiceFailure);
 };
 
 /****************************************************************************/
@@ -277,137 +277,137 @@ exception InvalidLogins { IdentifierSeq loginIds; };
  *        for invalidado (logout).
  */
 interface LoginObserver {
-	/**
-	 * \brief Notifica que um login observado foi invalidado.
-	 *
-	 * \param login Informações do login invalidado.
-	 */
-	void entityLogout(in LoginInfo login);
+  /**
+   * \brief Notifica que um login observado foi invalidado.
+   *
+   * \param login Informações do login invalidado.
+   */
+  void entityLogout(in LoginInfo login);
 };
 
 /**
  * \brief Gerência de logins observados por um observador registrado.
  */
 interface LoginObserverSubscription {
-	
-	/**
-	 * \brief Adiciona um login à lista de logins observadas.
-	 *
-	 * \param loginId Identificador do login a ser observado.
-	 *
-	 * \return \c true se o login indicado é válido e passa a ser observado ou
-	 *         \c false se o login fornecido é inválido e por essa razão não
-	 *         pode ser observado.
-	 */
-	boolean watchLogin(in Identifier loginId) raises (ServiceFailure);
-	
-	/**
-	 * \brief Remove um login da lista de logins observadas.
-	 *
-	 * Se o login informado não estiver na lista de logins observadas (inclusive
-	 * logins inválidas) essa operação não tem efeito algum.
-	 *
-	 * \param loginId Identificador do login a ser removido.
-	 */
-	void forgetLogin(in Identifier loginId) raises (ServiceFailure);
-	
-	/**
-	 * \brief Adiciona uma sequência de logins à lista de logins observados.
-	 *
-	 * \param loginIds Uma sequência de identificadores de logins a serem
-	 *                 observadas.
-	 *
-	 * \exception InvalidLogins Indica que alguns dos logins a serem observados
-	 *                          são inválidos.
-	 */
-	void watchLogins(in IdentifierSeq loginIds)
-		raises (InvalidLogins, ServiceFailure);
-	
-	/**
-	 * \brief Remove uma sequência de logins da lista de logins observados.
-	 *
-	 * Os logins da sequência que não estiverem na lista de logins observadas
-	 * são ignorados (isso inclui credenciais inválidas).
-	 *
-	 * \param loginIds Uma sequência de identificadores de logins a serem
-	 *                 removidos.
-	 */
-	void forgetLogins(in IdentifierSeq loginIds) raises (ServiceFailure);
-	
-	/**
-	 * \brief Obtem uma sequência dos logins observados por esse observador.
-	 *
-	 * \return A sequência logins observadas.
-	 */
-	LoginInfoSeq getWatchedLogins();
-	
-	/**
-	 * \brief Remove a inscrição desse observador, fazendo com que mais nenhum
-	 *        evento sobre os logins observadas seja mais notificado.
-	 */
-	void remove() raises (ServiceFailure);
+  
+  /**
+   * \brief Adiciona um login à lista de logins observadas.
+   *
+   * \param loginId Identificador do login a ser observado.
+   *
+   * \return \c true se o login indicado é válido e passa a ser observado ou
+   *         \c false se o login fornecido é inválido e por essa razão não
+   *         pode ser observado.
+   */
+  boolean watchLogin(in Identifier loginId) raises (ServiceFailure);
+  
+  /**
+   * \brief Remove um login da lista de logins observadas.
+   *
+   * Se o login informado não estiver na lista de logins observadas (inclusive
+   * logins inválidas) essa operação não tem efeito algum.
+   *
+   * \param loginId Identificador do login a ser removido.
+   */
+  void forgetLogin(in Identifier loginId) raises (ServiceFailure);
+  
+  /**
+   * \brief Adiciona uma sequência de logins à lista de logins observados.
+   *
+   * \param loginIds Uma sequência de identificadores de logins a serem
+   *                 observadas.
+   *
+   * \exception InvalidLogins Indica que alguns dos logins a serem observados
+   *                          são inválidos.
+   */
+  void watchLogins(in IdentifierSeq loginIds)
+    raises (InvalidLogins, ServiceFailure);
+  
+  /**
+   * \brief Remove uma sequência de logins da lista de logins observados.
+   *
+   * Os logins da sequência que não estiverem na lista de logins observadas
+   * são ignorados (isso inclui credenciais inválidas).
+   *
+   * \param loginIds Uma sequência de identificadores de logins a serem
+   *                 removidos.
+   */
+  void forgetLogins(in IdentifierSeq loginIds) raises (ServiceFailure);
+  
+  /**
+   * \brief Obtem uma sequência dos logins observados por esse observador.
+   *
+   * \return A sequência logins observadas.
+   */
+  LoginInfoSeq getWatchedLogins();
+  
+  /**
+   * \brief Remove a inscrição desse observador, fazendo com que mais nenhum
+   *        evento sobre os logins observadas seja mais notificado.
+   */
+  void remove() raises (ServiceFailure);
 };
 
 interface LoginRegistry {
-	/**
-	 * \brief Devolve uma lista de todos os logins ativos no barramento.
-	 *
-	 * \return Lista de informações de todos os logins ativos no barramento.
-	 */
-	LoginInfoSeq getAllLogins() raises (ServiceFailure);
-	
-	/**
-	 * \brief Devolve uma lista de todos os logins ativos de uma entidade.
-	 *
-	 * \param entity Identificador de uma entidade.
-	 * 
-	 * \return Lista de informações de todos os logins ativos da entidade.
-	 */
-	LoginInfoSeq getEntityLogins(in Identifier entity) raises (ServiceFailure);
-	
-	/**
-	 * \brief Encerra um login no barramento.
-	 *
-	 * \param loginId Identificador do login a ser encerrado.
-	 * 
-	 * \return \c true se o login informado está válido e foi invalidado, ou
-	 *         \c false se o login informado não é válido.
-	 */
-	boolean invalidateLogin(in Identifier loginId) raises (ServiceFailure);
-	
-	/**
-	 * \brief Devolve informações de um login válido.
-	 *
-	 * \param loginId Identificador do logins sendo consultado.
-	 *
-	 * \exception InvalidLogins Indica que o login informado é inválido.
-	 */
-	LoginInfo getLoginInfo(in Identifier loginId, out OctetSeq pubkey)
-		raises (InvalidLogins, ServiceFailure);
-	
-	/**
-	 * \brief Verifica a validade de uma sequência de logins.
-	 *
-	 * \param loginIds Sequência de identificadores de logins sendo consultados.
-	 *
-	 * \return Uma sequência de valores indicando o tempo mínimo (em segundos)
-	 *         pelo qual cada login da sequência fornecida permanecerá válido
-	 *         sem necessidade de renovação. Caso a validade já tenha expirado,
-	 *         o valor indicado é zero, indicando que o login não é mais válido.
-	 */
-	ValidityTimeSeq getValidity(in IdentifierSeq loginIds)
-		raises (ServiceFailure);
-	
-	/**
-	 * \brief Inscreve um observador para noficação de eventos de logins.
-	 *
-	 * \param callback Objeto de callback a ser utilizado para nofificação
-	 *                     de eventos.
-	 *
-	 * \return Objeto para gerência da inscrição do observador.
-	 */
-	LoginObserverSubscription subscribeObserver(in LoginObserver callback)
-		raises (ServiceFailure);
+  /**
+   * \brief Devolve uma lista de todos os logins ativos no barramento.
+   *
+   * \return Lista de informações de todos os logins ativos no barramento.
+   */
+  LoginInfoSeq getAllLogins() raises (ServiceFailure);
+  
+  /**
+   * \brief Devolve uma lista de todos os logins ativos de uma entidade.
+   *
+   * \param entity Identificador de uma entidade.
+   * 
+   * \return Lista de informações de todos os logins ativos da entidade.
+   */
+  LoginInfoSeq getEntityLogins(in Identifier entity) raises (ServiceFailure);
+  
+  /**
+   * \brief Encerra um login no barramento.
+   *
+   * \param loginId Identificador do login a ser encerrado.
+   * 
+   * \return \c true se o login informado está válido e foi invalidado, ou
+   *         \c false se o login informado não é válido.
+   */
+  boolean invalidateLogin(in Identifier loginId) raises (ServiceFailure);
+  
+  /**
+   * \brief Devolve informações de um login válido.
+   *
+   * \param loginId Identificador do logins sendo consultado.
+   *
+   * \exception InvalidLogins Indica que o login informado é inválido.
+   */
+  LoginInfo getLoginInfo(in Identifier loginId, out OctetSeq pubkey)
+    raises (InvalidLogins, ServiceFailure);
+  
+  /**
+   * \brief Verifica a validade de uma sequência de logins.
+   *
+   * \param loginIds Sequência de identificadores de logins sendo consultados.
+   *
+   * \return Uma sequência de valores indicando o tempo mínimo (em segundos)
+   *         pelo qual cada login da sequência fornecida permanecerá válido
+   *         sem necessidade de renovação. Caso a validade já tenha expirado,
+   *         o valor indicado é zero, indicando que o login não é mais válido.
+   */
+  ValidityTimeSeq getValidity(in IdentifierSeq loginIds)
+    raises (ServiceFailure);
+  
+  /**
+   * \brief Inscreve um observador para noficação de eventos de logins.
+   *
+   * \param callback Objeto de callback a ser utilizado para nofificação
+   *                     de eventos.
+   *
+   * \return Objeto para gerência da inscrição do observador.
+   */
+  LoginObserverSubscription subscribeObserver(in LoginObserver callback)
+    raises (ServiceFailure);
 };
 
 }; // access_control
