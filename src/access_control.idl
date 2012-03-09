@@ -28,6 +28,7 @@ const unsigned long InvalidChainCode      = 0x42555301; // 1112888065 "BUS\1"
 const unsigned long InvalidLoginCode      = 0x42555302; // 1112888066 "BUS\2"
 const unsigned long UnverifiedLoginCode   = 0x42555303; // 1112888067 "BUS\3"
 const unsigned long UnknownBusCode        = 0x42555304; // 1112888068 "BUS\4"
+const unsigned long InvalidPublicKeyCode  = 0x42555305; // 1112888069 "BUS\5"
 
 /* minor codes de CORBA::NO_PERMISSION da biblioteca de acesso do OpenBus */
 const unsigned long NoLoginCode           = 0x425553FF; // 1112888319 "BUS\255"
