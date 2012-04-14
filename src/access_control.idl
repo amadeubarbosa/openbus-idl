@@ -2,6 +2,7 @@
 #define __TECGRAF_OPENBUS_CORE_ACCESS_CREDENTIAL_SERVICE_IDL__
 
 #include "core.idl"
+#include "credential.idl"
 
 module tecgraf {
 
@@ -34,9 +35,6 @@ const unsigned long InvalidPublicKeyCode  = 0x42555305; // 1112888069 "BUS\5"
 const unsigned long NoLoginCode           = 0x425553FF; // 1112888319 "BUS\255"
 const unsigned long InvalidRemoteCode     = 0x425553FE; // 1112888318 "BUS\254"
 
-/* minor codes de CORBA::NO_PERMISSION específicos de aplicação */
-const unsigned long DeniedLoginCode       = 0x425553FD; // 1112888317 "BUS\253"
-
 /****************************************************************************/
 /* Faceta de Gerência de Certificados de Entidades **************************/
 /****************************************************************************/
@@ -66,9 +64,10 @@ interface CertificateRegistry {
    * \param certificate Certificado a ser associado a entidade.
    *
    * \exception InvalidCertificate Certificado fornecido é inválido.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   void registerCertificate(in Identifier entity, in EntityCertificate cert)
-    raises (InvalidCertificate, ServiceFailure);
+    raises (InvalidCertificate, UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Obtém o certificado associado a uma dada entidade no barramento.
@@ -78,16 +77,20 @@ interface CertificateRegistry {
    * \return certificate Certificado a ser associado a entidade.
    *
    * \exception MissingCertificate Certificado não encontrado.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   EntityCertificate getCertificate(in Identifier entity)
-    raises (MissingCertificate, ServiceFailure);
+    raises (MissingCertificate, UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Remove um certificado associado a uma entidade.
    *
    * \param entity Ident. da entidade a qual o certificado está associado.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  boolean removeCertificate(in Identifier entity) raises (ServiceFailure);
+  boolean removeCertificate(in Identifier entity)
+    raises (UnauthorizedOperation, ServiceFailure);
 };
 
 /****************************************************************************/
@@ -109,11 +112,6 @@ typedef sequence<LoginInfo> LoginInfoSeq;
 struct CallChain {
   Identifier target; /**< \brief Identificador de login a quem a cadeia se destina. */
   LoginInfoSeq callers; /**< \brief Informações de login das entidades da cadeia. */
-};
-/** \brief Cadeia de chamada assinada pelo barramento. */
-struct SignedCallChain {
-  EncryptedBlock signature; /** \brief Hash de 'encoded' assinado pelo barramento. */
-  OctetSeq encoded; /** \brief estrutura CallChain codificada usando CDR */
 };
 
 
@@ -259,7 +257,7 @@ interface AccessControl {
    *
    * \param entity Identificador de login que podera se adicionar a cadeia.
    */
-  SignedCallChain signChainFor(in Identifier target)
+  credential::SignedCallChain signChainFor(in Identifier target)
     raises (ServiceFailure);
 };
 
@@ -354,8 +352,10 @@ interface LoginRegistry {
    * \brief Devolve uma lista de todos os logins ativos no barramento.
    *
    * \return Lista de informações de todos os logins ativos no barramento.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  LoginInfoSeq getAllLogins() raises (ServiceFailure);
+  LoginInfoSeq getAllLogins() raises (UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Devolve uma lista de todos os logins ativos de uma entidade.
@@ -363,8 +363,11 @@ interface LoginRegistry {
    * \param entity Identificador de uma entidade.
    * 
    * \return Lista de informações de todos os logins ativos da entidade.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  LoginInfoSeq getEntityLogins(in Identifier entity) raises (ServiceFailure);
+  LoginInfoSeq getEntityLogins(in Identifier entity)
+    raises (UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Encerra um login no barramento.
@@ -373,8 +376,11 @@ interface LoginRegistry {
    * 
    * \return \c true se o login informado está válido e foi invalidado, ou
    *         \c false se o login informado não é válido.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  boolean invalidateLogin(in Identifier loginId) raises (ServiceFailure);
+  boolean invalidateLogin(in Identifier loginId)
+    raises (UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Devolve informações de um login válido.

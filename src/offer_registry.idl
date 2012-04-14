@@ -128,18 +128,34 @@ interface ServiceOffer {
   /**
    * \brief Altera as propriedades do serviço ofertado.
    *
+   * Essa operação permite alterar as propriedades do serviço ofertado que
+   * ficam disponíveis através do atributo 'properties'. Essa operação só pode
+   * ser chamada pela mesma entidade que registrou a oferta ou por uma entidade
+   * com permissão de adminstração no barramento.
+   *
    * \param properties Novas propriedades da oferta de serviço.
    *
    * \exception InvalidProperties A lista de propriedades fornecida inclui
    *                              propridades inválidas, tais como
    *                              propriedades automáticas (cujo nome começam
    *                              com 'openbus.').
+   * \exception UnauthorizedOperation Entidade que chama não é a mesma que
+   *                                  registrou a oferta nem administrador.
    */
   void setProperties(in ServicePropertySeq properties)
-    raises (InvalidProperties, ServiceFailure);
+    raises (InvalidProperties, UnauthorizedOperation, ServiceFailure);
   
-  /** \brief Remove a oferta de serviço. */
-  void remove() raises (ServiceFailure);
+  /**
+   * \brief Remove a oferta de serviço.
+   *
+   * Essa operação permite remover o serviço ofertado. Essa operação só pode
+   * ser chamada pela mesma entidade que registrou a oferta ou por uma entidade
+   * com permissão de adminstração no barramento.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é a mesma que
+   *                                  registrou a oferta nem administrador.
+   */
+  void remove() raises (UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Inscreve um observador da oferta.
@@ -326,8 +342,10 @@ interface EntityCategory {
    * \brief Altera a descrição da categoria.
    *
    * \param name Nome descritivo da categoria.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  void setName(in string name) raises (ServiceFailure);
+  void setName(in string name) raises (UnauthorizedOperation, ServiceFailure);
 
   /** 
    * \brief Remove a categoria de entidade.
@@ -335,16 +353,20 @@ interface EntityCategory {
    * A categoria só é removida se não existir nenhuma entidade nela.
    *
    * \exception EntityCategoryInUse A categoria possui alguma entidade.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  void remove() raises (EntityCategoryInUse, ServiceFailure);
+  void remove()
+    raises (EntityCategoryInUse, UnauthorizedOperation, ServiceFailure);
   
   /** 
    * \brief Remove a categoria e todas suas entidades.
    *
    * Se houver alguma entidade cadastrada nessa categoria  ela também é
    * removida.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  void removeAll() raises (ServiceFailure);
+  void removeAll() raises (UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Cria uma nova entidade nessa categoria.
@@ -354,9 +376,10 @@ interface EntityCategory {
    *
    * \exception EntityAlreadyRegistered Indica que uma entidade com esse
    *            identificador já está registrada.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   RegisteredEntity registerEntity(in Identifier id, in string name)
-    raises (EntityAlreadyRegistered, ServiceFailure);
+    raises (EntityAlreadyRegistered, UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Recupera todas entidades nessa categoria.
@@ -368,7 +391,7 @@ interface EntityCategory {
 
 /** 
  * \brief Representa uma entidade do barramento registrada.
- *
+s *
  * Entidade é tudo aquilo que pode se logar ao barramento e usufruir dos
  * recursos do barramento. Em particular, tanto usuários humanos como
  * implantações de sistema são considerados entidades. Entidades podem ou não
@@ -387,16 +410,20 @@ interface RegisteredEntity {
    * \brief Altera o nome descritivo da entidade.
    *
    * \param name Nome descritivo da entidade.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  void setName(in string name) raises (ServiceFailure);
+  void setName(in string name) raises (UnauthorizedOperation, ServiceFailure);
   
   /** 
    * \brief Remove o registro da entidade.
    *
    * Todas as autorizações e ofertas de serviço da entidade são removidas
    * juntamente com a entidade.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  void remove() raises (ServiceFailure);
+  void remove() raises (UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Autoriza que a entidade possa ofertar serviços que implementem
@@ -409,9 +436,10 @@ interface RegisteredEntity {
    *         a operação não resultou em nenhuma mudança.
    *
    * \exception InvalidInterface A interface é inválida (não está registrada).
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   boolean grantInterface(in InterfaceId ifaceId)
-    raises (InvalidInterface, ServiceFailure);
+    raises (InvalidInterface, UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Remove a autorização da entidade de ofertar serviços que
@@ -427,17 +455,22 @@ interface RegisteredEntity {
    * \exception AuthorizationInUse Existem ofertas de serviço dessa entidade
    *                               que implementam interfaces referentes a
    *                               essa autorização.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   boolean revokeInterface(in InterfaceId ifaceId)
-    raises (InvalidInterface, AuthorizationInUse, ServiceFailure);
+    raises (InvalidInterface, AuthorizationInUse,
+            UnauthorizedOperation, ServiceFailure);
   
   /**
    * \brief Devolve a lista de especificações de interfaces autorizadas
    *        associados a essa entidade.
    *
    * \return Lista de especificação de interfaces autorizadas.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
-  InterfaceIdSeq getGrantedInterfaces() raises (ServiceFailure);
+  InterfaceIdSeq getGrantedInterfaces()
+    raises (UnauthorizedOperation, ServiceFailure);
 };
 
 /**
@@ -453,9 +486,10 @@ interface EntityRegistry {
    *
    * \exception EntityCategoryAlreadyExists Indica que uma categoria com o mesmo
    *                                        identificador já está existe.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   EntityCategory createEntityCategory(in Identifier id, in string name)
-    raises (EntityCategoryAlreadyExists, ServiceFailure);
+    raises (EntityCategoryAlreadyExists, UnauthorizedOperation, ServiceFailure);
   
   /** 
    * \brief Recupera todos as categorias de entidade existentes.
@@ -530,9 +564,11 @@ interface InterfaceRegistry {
    *
    * \return \c true caso a interface não estava registrada e foi registrada,
    *         e \c false caso a interface já estava registrada.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   boolean registerInterface(in InterfaceId ifaceId) 
-    raises (InvalidInterface, ServiceFailure);
+    raises (InvalidInterface, UnauthorizedOperation, ServiceFailure);
   
   /** 
    * \brief Remove uma interface autorizada do cadastro.
@@ -541,9 +577,11 @@ interface InterfaceRegistry {
    *
    * \return \c true caso a interface estava registrada e foi removida, e
    *         \c false caso a interface não estivesse registrada.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   boolean removeInterface(in InterfaceId ifaceId)
-    raises (InterfaceInUse, ServiceFailure);
+    raises (InterfaceInUse, UnauthorizedOperation, ServiceFailure);
   
   /** 
    * \brief Devolve uma lista de todas as interfaces .

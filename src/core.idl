@@ -46,6 +46,9 @@ typedef sequence<octet> OctetSeq;
 
 module services {
   
+  /** \brief Indica que a operação chamada não é permitida para a entidade. */
+  exception UnauthorizedOperation {};
+  
   /** \brief Exceção que sinaliza uma falha interna num serviço básico. */
   exception ServiceFailure { string message; };
   
