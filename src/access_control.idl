@@ -54,7 +54,7 @@ exception InvalidCertificate { string message; };
 
 
 /**
- * \brief Gerência de credenciais de entidades logadas no barramento.
+ * \brief Gerência de certificados de autenticação de entidades no barramento.
  */
 interface CertificateRegistry {
   /**
@@ -166,7 +166,7 @@ interface LoginProcess {
 };
 
 /**
- * \brief Gerência de credenciais de entidades logadas no barramento.
+ * \brief Gerência de controle de acesso de entidades ao barramento.
  */
 interface AccessControl {
   readonly attribute Identifier busid;
@@ -212,7 +212,7 @@ interface AccessControl {
    * \param challenge Desafio a ser decodificado com a chave privada da
    *                  entidade.
    *
-   * \return Objeto a ser usado para efetuar o login e obter da credencial.
+   * \return Objeto a ser usado para efetuar o login.
    * 
    * \exception MissingCertificate Certificado não encontrado.
    */
@@ -230,7 +230,7 @@ interface AccessControl {
    * inválido após um tempo. Em ambos os casos, é necessário reiniciar o
    * processo de login por certificado chamando essa operação novamente.
    *
-   * \return Objeto a ser usado para efetuar o login e obter da credencial.
+   * \return Objeto a ser usado para efetuar o login.
    */
   LoginProcess startLoginBySingleSignOn(out EncryptedBlock challenge)
     raises (ServiceFailure);
@@ -327,7 +327,7 @@ interface LoginObserverSubscription {
    * \brief Remove uma sequência de logins da lista de logins observados.
    *
    * Os logins da sequência que não estiverem na lista de logins observadas
-   * são ignorados (isso inclui credenciais inválidas).
+   * são ignorados (isso inclui logins inválidas).
    *
    * \param loginIds Uma sequência de identificadores de logins a serem
    *                 removidos.
