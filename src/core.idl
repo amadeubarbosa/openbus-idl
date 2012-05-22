@@ -36,7 +36,7 @@ typedef string Identifier;
 /** \brief Representa uma sequência de identificadores. */
 typedef sequence<Identifier> IdentifierSeq;
 
-/** TODO: ajustar o código abaixo depois de corrigir o bug do LuaIDL (OIL-40) */
+/* TODO: ajustar o código abaixo depois de corrigir o bug do LuaIDL (OIL-40) */
 //typedef octet HashValue[HashValueSize]; /**< \brief Array de um hash */
 //typedef octet EncryptedBlock[EncryptedBlockSize]; /**< \brief Bloco encriptado */
 typedef octet HashValue[32]; /**< \brief Array de um hash */
