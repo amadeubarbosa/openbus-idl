@@ -20,8 +20,11 @@ module services {
  */
 module offer_registry {
 
+/** \brief Nome da faceta de Registro de Ofertas. */
 const string OfferRegistryFacet = "OfferRegistry_2_00"; // "OfferRegistry" + Version;
+/** \brief Nome da faceta de Registro de Entidades. */
 const string EntityRegistryFacet = "EntityRegistry_2_00"; // "EntityRegistry" + Version;
+/** \brief Nome da faceta de Registro de Interfaces. */
 const string InterfaceRegistryFacet = "InterfaceRegistry_2_00"; // "InterfaceRegistry" + Version;
 
 /****************************************************************************/
@@ -39,8 +42,8 @@ typedef sequence<FacetName> FacetNameSeq;
 
 /** \brief Propriedade que descreve um aspecto de uma oferta de serviço. */
 struct ServiceProperty {
-  string name;
-  string value;
+  string name; /**< \brief nome da propriedade */
+  string value; /**< \brief valor da propriedade */
 };
 /** \brief Sequência de propriedades que descrevem uma oferta de serviço. */
 typedef sequence<ServiceProperty> ServicePropertySeq;
@@ -50,9 +53,9 @@ typedef scs::core::IComponent OfferedService;
 
 /** \brief Descreve uma oferta de serviço. */
 struct ServiceOfferDesc {
-  OfferedService service_ref; /** \brief Referência para o serviço ofertado. */
-  ServicePropertySeq properties; /** \brief Propriedades do serviço ofertado. */
-  ServiceOffer ref; /** \brief Objeto que representa a oferta de serviço. */
+  OfferedService service_ref; /**< \brief Referência para o serviço ofertado. */
+  ServicePropertySeq properties; /**< \brief Propriedades do serviço ofertado. */
+  ServiceOffer ref; /**< \brief Objeto que representa a oferta de serviço. */
 };
 /** \brief Sequência de descrições de oferta de serviço. */
 typedef sequence<ServiceOfferDesc> ServiceOfferDescSeq;
@@ -94,7 +97,7 @@ interface OfferObserver {
   /**
    * \brief Notifica que a oferta observada foi removida.
    *
-   * \param offers O descritor da oferta.
+   * \param offer O descritor da oferta.
    */
   void removed(in ServiceOfferDesc offer);
 };
@@ -107,7 +110,7 @@ interface OfferRegistrationObserver {
    * \brief Notifica que uma oferta que atende ao critério de propriedades do 
    *        observador foi registrada.
    *
-   * \param offers A oferta registrada que atende ao critério de propriedades.
+   * \param offer A oferta registrada que atende ao critério de propriedades.
    */
   void offerRegistered(in ServiceOfferDesc offer);
 };
@@ -122,7 +125,11 @@ interface ServiceOffer {
   /** \brief Lista de propriedades do serviço ofertado. */
   readonly attribute ServicePropertySeq properties;
   
-  /** \brief Devolve uma estrutura descrevedo a oferta de serviço. */
+  /**
+   * \brief Devolve uma estrutura descrevedo a oferta de serviço. 
+   *
+   * \return A descrição da oferta
+   */
   ServiceOfferDesc describe();
   
   /**
@@ -283,19 +290,19 @@ interface EntityCategory; /* forward declaration */
 
 /** \brief Descrição de uma categoria de entidade. */
 struct EntityCategoryDesc {
-  Identifier id;      /** /brief Identificador da categoria. */
-  string name;        /** /brief Nome descritivo da categoria. */
-  EntityCategory ref; /** /brief Objeto que representa a categoria. */
+  Identifier id;      /**< \brief Identificador da categoria. */
+  string name;        /**< \brief Nome descritivo da categoria. */
+  EntityCategory ref; /**< \brief Objeto que representa a categoria. */
 };
 /** \brief Sequência de descrições de catergorias de entidade. */
 typedef sequence<EntityCategoryDesc> EntityCategoryDescSeq;
 
 /** \brief Descrição de uma entidade registrada. */
 struct RegisteredEntityDesc {
-  EntityCategory category; /** /brief Categoria da entidade. */
-  Identifier id;           /** /brief Identificador da entidade. */
-  string name;             /** /brief Nome descritivo da entidade. */
-  RegisteredEntity ref;    /** /brief Objeto que representa a entidade. */
+  EntityCategory category; /**< \brief Categoria da entidade. */
+  Identifier id;           /**< \brief Identificador da entidade. */
+  string name;             /**< \brief Nome descritivo da entidade. */
+  RegisteredEntity ref;    /**< \brief Objeto que representa a entidade. */
 };
 /** \brief Sequência de descrições sobre entidades registradas */
 typedef sequence<RegisteredEntityDesc> RegisteredEntityDescSeq;
@@ -307,10 +314,10 @@ typedef sequence<InterfaceId> InterfaceIdSeq;
 
 
 
-/** \brief Indica que uma entidade com o ident. dado já está registrada. */
+/** \brief Indica que uma entidade com o identificador dado já está registrada. */
 exception EntityAlreadyRegistered { RegisteredEntityDesc existing; };
 
-/** \brief Indica que uma categoria com o ident. dado já existe. */
+/** \brief Indica que uma categoria com o identificador dado já existe. */
 exception EntityCategoryAlreadyExists { EntityCategoryDesc existing; };
 
 /** \brief Indica que existe entidades nessa categoria de entidade. */
@@ -332,10 +339,14 @@ exception AuthorizationInUse { ServiceOfferDescSeq offers; };
  * pelo administrador do sistema.
  */
 interface EntityCategory {
-  readonly attribute Identifier id; /** /brief Identificador da categoria */
-  readonly attribute string name;   /** /brief Nome descritivo da categoria */
+  readonly attribute Identifier id; /**< \brief Identificador da categoria */
+  readonly attribute string name;   /**< \brief Nome descritivo da categoria */
   
-  /** \brief Devolve uma estrutura descrevedo a categoria de entidade. */
+  /** 
+   * \brief Devolve uma estrutura descrevedo a categoria de entidade.
+   *
+   * \return A descrição da categoria de entidade
+   */
   EntityCategoryDesc describe();
   
   /**
@@ -391,7 +402,7 @@ interface EntityCategory {
 
 /** 
  * \brief Representa uma entidade do barramento registrada.
-s *
+ *
  * Entidade é tudo aquilo que pode se logar ao barramento e usufruir dos
  * recursos do barramento. Em particular, tanto usuários humanos como
  * implantações de sistema são considerados entidades. Entidades podem ou não
@@ -399,11 +410,15 @@ s *
  * autorizadas a ofertar serviços.
  */
 interface RegisteredEntity {
-  readonly attribute EntityCategory category; /** /brief Categoria da entidade */
-  readonly attribute Identifier id;           /** /brief Identificador da entidade */
-  readonly attribute string name;             /** /brief Nome descritivo da entidade */
+  readonly attribute EntityCategory category; /**< \brief Categoria da entidade */
+  readonly attribute Identifier id;           /**< \brief Identificador da entidade */
+  readonly attribute string name;             /**< \brief Nome descritivo da entidade */
   
-  /** \brief Devolve uma estrutura descrevedo a entidade registrada. */
+  /** 
+   * \brief Devolve uma estrutura descrevedo a entidade registrada. 
+   *
+   * \return A descrição da entidade registrada
+   */
   RegisteredEntityDesc describe();
   
   /**
@@ -492,7 +507,7 @@ interface EntityRegistry {
     raises (EntityCategoryAlreadyExists, UnauthorizedOperation, ServiceFailure);
   
   /** 
-   * \brief Recupera todos as categorias de entidade existentes.
+   * \brief Recupera todas as categorias de entidade existentes.
    *
    * \return Uma sequência de descrições das categorias.
    */
@@ -556,6 +571,9 @@ exception InterfaceInUse { RegisteredEntityDescSeq entities; };
 
 
 
+/**
+ * \brief Interface de registro de interfaces do barramento.
+ */
 interface InterfaceRegistry {
   /** 
    * \brief Registra uma interface autorizada no cadastro.
@@ -584,7 +602,9 @@ interface InterfaceRegistry {
     raises (InterfaceInUse, UnauthorizedOperation, ServiceFailure);
   
   /** 
-   * \brief Devolve uma lista de todas as interfaces .
+   * \brief Devolve uma lista de todas as interfaces cadastradas.
+   *
+   * \return Lista de interfaces cadastradas.
    */
   InterfaceIdSeq getInterfaces() raises (ServiceFailure);
 };

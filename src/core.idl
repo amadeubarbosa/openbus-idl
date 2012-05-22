@@ -24,26 +24,30 @@ module core {
  */
 module v2_00 {
 
-const octet MajorVersion = 2;
-const octet MinorVersion = 0;
-const string BusEntity = "OpenBus";
-const string BusObjectKey = "OpenBus";
-const unsigned short HashValueSize = 32;
-const unsigned short EncryptedBlockSize = 256;
+const octet MajorVersion = 2; /**< \brief Major da versão */
+const octet MinorVersion = 0; /**< \brief Minor da versão */
+const string BusEntity = "OpenBus"; /**< \brief Nome da entidade do Barramento */
+const string BusObjectKey = "OpenBus"; /**< \brief Chave da entidade do Barramento */
+const unsigned short HashValueSize = 32; /**< \brief Tamanho do hash */
+const unsigned short EncryptedBlockSize = 256;/**< \brief Tamanho do bloco encriptado */
 
 /** \brief Representa um identificador único. */
 typedef string Identifier;
+/** \brief Representa uma sequência de identificadores. */
 typedef sequence<Identifier> IdentifierSeq;
 
 /** TODO: ajustar o código abaixo depois de corrigir o bug do LuaIDL (OIL-40) */
-//typedef octet HashValue[HashValueSize];
-//typedef octet EncryptedBlock[EncryptedBlockSize];
-typedef octet HashValue[32];
-typedef octet EncryptedBlock[256];
+//typedef octet HashValue[HashValueSize]; /**< \brief Array de um hash */
+//typedef octet EncryptedBlock[EncryptedBlockSize]; /**< \brief Bloco encriptado */
+typedef octet HashValue[32]; /**< \brief Array de um hash */
+typedef octet EncryptedBlock[256]; /**< \brief Bloco encriptado */
 
 /** \brief Representa uma sequência de bytes. */
 typedef sequence<octet> OctetSeq;
 
+/**
+ * \brief Módulo dos Serviços Básicos do OpenBus.
+ */
 module services {
   
   /** \brief Indica que a operação chamada não é permitida para a entidade. */
