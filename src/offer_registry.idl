@@ -200,9 +200,9 @@ interface OfferRegistry {
    *                           não apresentar facetas padrão definidas pelo
    *                           modelo de componetes SCS.
    * \exception InvalidProperties A lista de propriedades fornecida inclui
-   *                              propridades inválidas, tais como
-   *                              propriedades automáticas (cujo nome começam
-   *                              com 'openbus.').
+   *                              propriedades inválidas, tais como
+   *                              propriedades com nomes reservados (cujos 
+   *                              nomes começam com 'openbus.').
    * \exception UnauthorizedFacets O componente que implementa o serviço
    *                               apresenta facetas com interfaces que não
    *                               estão autorizadas para a entidade
