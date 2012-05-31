@@ -122,7 +122,28 @@ interface ServiceOffer {
   /** \brief Referência para o serviço ofertado. */
   readonly attribute OfferedService service_ref;
   
-  /** \brief Lista de propriedades do serviço ofertado. */
+  /**
+   * \brief Lista de propriedades do serviço ofertado.
+   *
+   * As seguintes propriedades são geradas automaticamente no registro de uma
+   * oferta e não são alteradas através da operação \c setProperties.
+   *
+   * openbus.offer.id: Ident. único da oferta.
+   * openbus.offer.login: Ident. do login com que a oferta foi registrada.
+   * openbus.offer.entity: Ident. da entidade que registrou a oferta.
+   * openbus.offer.year: Ano em que a oferta foi registrada.
+   * openbus.offer.month: Número do mês em que a oferta foi registrada.
+   * openbus.offer.day: Dia do mês que a oferta foi registrada.
+   * openbus.offer.hour: Hora do dia em que a oferta foi registrada.
+   * openbus.offer.minute: Minuto do dia em que a oferta foi registrada.
+   * openbus.offer.second: Segundo do dia em que a oferta foi registrada.
+   * openbus.component.name: Nome do componente SCS que implementa o serviço.
+   * openbus.component.version.major: Versão maior do componente SCS que implementa o serviço.
+   * openbus.component.version.minor: Versão menor do componente SCS que implementa o serviço.
+   * openbus.component.version.patch: Versão de correção do componente SCS que implementa o serviço.
+   * openbus.component.facet: Nome de faceta oferecida pelo component SCS que implementa o serviço.
+   * openbus.component.interface: RepID de interface implementada por faceta do component SCS que implementa o serviço.
+   */
   readonly attribute ServicePropertySeq properties;
   
   /**
@@ -220,23 +241,7 @@ interface OfferRegistry {
    * Serão selecionadas apenas as ofertas de serviço que apresentem todas as 
    * propriedades especificadas. As propriedades utilizadas nas buscas podem
    * ser aquelas fornecidas no momento do registro da oferta de serviço, assim
-   * como as propriedades automaticamente geradas pelo Openbus, listas a
-   * seguir:
-   *
-   * openbus.offer.login: Ident. da login com que a oferta foi registrada.
-   * openbus.offer.entity: Ident. da entidade que registrou a oferta.
-   * openbus.offer.year: Ano em que a oferta foi registrada.
-   * openbus.offer.month: Número do mês em que a oferta foi registrada.
-   * openbus.offer.day: Dia do mês que a oferta foi registrada.
-   * openbus.offer.hour: Hora do dia em que a oferta foi registrada.
-   * openbus.offer.minute: Minuto do dia em que a oferta foi registrada.
-   * openbus.offer.second: Segundo do dia em que a oferta foi registrada.
-   * openbus.component.name: Nome do componente SCS que implementa o serviço.
-   * openbus.component.version.major: Versão maior do componente SCS que implementa o serviço.
-   * openbus.component.version.minor: Versão menor do componente SCS que implementa o serviço.
-   * openbus.component.version.patch: Versão de correção do componente SCS que implementa o serviço.
-   * openbus.component.facet: Nome de faceta oferecida pelo component SCS que implementa o serviço.
-   * openbus.component.interface: RepID de interface implementada por faceta do component SCS que implementa o serviço.
+   * como as propriedades automaticamente geradas pelo Openbus.
    * 
    * \param properties Propriedades que as ofertas de serviços encontradas
    *                   devem apresentar.
