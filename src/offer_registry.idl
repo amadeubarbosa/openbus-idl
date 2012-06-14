@@ -192,7 +192,7 @@ interface ServiceOffer {
    *
    * \return Um identificador da inscrição do observador.
    */
-  Cookie subscribe(in OfferObserver observer) raises (ServiceFailure);
+  Cookie subscribeObserver(in OfferObserver observer) raises (ServiceFailure);
   
   /**
    * \brief Remove a inscrição do observador da oferta.
@@ -202,7 +202,7 @@ interface ServiceOffer {
    * \return \c true caso o descadastramento do observador foi bem sucedido e 
    *         \c false caso contrário.
    */
-  boolean unsubscribe(in Cookie ck) raises (ServiceFailure);
+  boolean unsubscribeObserver(in Cookie ck) raises (ServiceFailure);
 };
 
 /**
