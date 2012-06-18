@@ -137,7 +137,7 @@ typedef sequence<ValidityTime> ValidityTimeSeq;
 
 
 /** \brief Indica que um dado não foi codificado com a chave do barramento. */
-exception WrongEncoding {};
+exception WrongEncoding { string message; };
 
 /** \brief Indica que o acesso ao barramento foi negado sem justificaiva. */
 exception AccessDenied {};
