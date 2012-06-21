@@ -125,7 +125,8 @@ typedef sequence<LoginInfo> LoginInfoSeq;
 /** \brief Informações sobre uma cadeia de chamada aninhadas no barramento. */
 struct CallChain {
   Identifier target; /**< \brief Identificador de login a quem a cadeia se destina. */
-  LoginInfoSeq callers; /**< \brief Informações de login das entidades da cadeia. */
+  LoginInfoSeq originators; /**< \brief Informações de login das entidades que realizaram as chamadas em cadeia que originam essa chamada. */
+  LoginInfo caller; /**< \brief Informações de login da entidades que efetivamente fez chamada atual (última da cadeia). */
 };
 
 
