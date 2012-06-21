@@ -136,6 +136,9 @@ typedef sequence<ValidityTime> ValidityTimeSeq;
 
 
 
+/** \brief Indica que a chave de acesso fornecida é inválida. */
+exception InvalidPublicKey { string message; };
+
 /** \brief Indica que um dado não foi codificado com a chave do barramento. */
 exception WrongEncoding { string message; };
 
@@ -165,6 +168,8 @@ interface LoginProcess {
    *
    * \return Identificador do login estabelecido
    *
+   * \exception InvalidPublicKey A autenticação falhou, pois a chave pública
+   *                             de acesso fornecida é inválida.
    * \exception WrongEncoding A autenticação falhou, pois a resposta ao
    *                          desafio não foi codificada corretamente
    *                          com a chave pública do barramento.
@@ -173,7 +178,7 @@ interface LoginProcess {
    */
   LoginInfo login(in OctetSeq pubkey, in EncryptedBlock encrypted,
                    out ValidityTime validity)
-    raises (WrongEncoding, AccessDenied, ServiceFailure);
+    raises (InvalidPublicKey, WrongEncoding, AccessDenied, ServiceFailure);
   
   /** \brief Cancela o processo de login por certificado. */
   oneway void cancel();
@@ -200,6 +205,8 @@ interface AccessControl {
    *
    * \return Identificador do login estabelecido
    *
+   * \exception InvalidPublicKey A autenticação falhou, pois a chave pública
+   *                             de acesso fornecida é inválida.
    * \exception WrongEncoding A autenticação falhou, pois a senha não foi
    *                          codificada corretamente com a chave pública do
    *                          barramento.
@@ -210,7 +217,7 @@ interface AccessControl {
    */
   LoginInfo loginByPassword(in Identifier entity, in OctetSeq pubkey,
                              in EncryptedBlock encrypted, out ValidityTime validity)
-    raises (WrongEncoding, AccessDenied, ServiceFailure);
+    raises (InvalidPublicKey, WrongEncoding, AccessDenied, ServiceFailure);
   
   /**
    * \brief Inicia o processo de login por certificado e cria um objeto para
