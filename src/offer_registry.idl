@@ -486,11 +486,9 @@ interface RegisteredEntity {
    *        associados a essa entidade.
    *
    * \return Lista de especificação de interfaces autorizadas.
-   *
-   * \exception UnauthorizedOperation Entidade que chama não é administrador.
    */
   InterfaceIdSeq getGrantedInterfaces()
-    raises (UnauthorizedOperation, ServiceFailure);
+    raises (ServiceFailure);
 };
 
 /**
