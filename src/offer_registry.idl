@@ -21,11 +21,11 @@ module services {
 module offer_registry {
 
 /** \brief Nome da faceta de Registro de Ofertas. */
-const string OfferRegistryFacet = "OfferRegistry_2_00"; // "OfferRegistry" + Version;
+const string OfferRegistryFacet = "OfferRegistry"; // "OfferRegistry" + Version;
 /** \brief Nome da faceta de Registro de Entidades. */
-const string EntityRegistryFacet = "EntityRegistry_2_00"; // "EntityRegistry" + Version;
+const string EntityRegistryFacet = "EntityRegistry"; // "EntityRegistry" + Version;
 /** \brief Nome da faceta de Registro de Interfaces. */
-const string InterfaceRegistryFacet = "InterfaceRegistry_2_00"; // "InterfaceRegistry" + Version;
+const string InterfaceRegistryFacet = "InterfaceRegistry"; // "InterfaceRegistry" + Version;
 
 /****************************************************************************/
 /* Faceta de Gerência de Ofertas de Serviço *********************************/
