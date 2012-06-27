@@ -22,13 +22,13 @@ module core {
 /**
  * \brief Módulo de versionamento dos Serviços Básicos do OpenBus.
  */
-module v2_00 {
+module v2_0 {
 
 const octet MajorVersion = 2; /**< \brief Major da versão */
 const octet MinorVersion = 0; /**< \brief Minor da versão */
 const string BusLogin = "00000000-0000-0000-0000-000000000000"; /**< \brief Login usado pelo Barramento */
 const string BusEntity = "OpenBus"; /**< \brief Nome da entidade do Barramento */
-const string BusObjectKey = "OpenBus_2_00"; /**< \brief Chave da entidade do Barramento */
+const string BusObjectKey = "OpenBus_2_0"; /**< \brief Chave da entidade do Barramento */
 const unsigned short HashValueSize = 32; /**< \brief Tamanho do hash */
 const unsigned short EncryptedBlockSize = 256;/**< \brief Tamanho do bloco encriptado */
 

@@ -10,7 +10,7 @@ module openbus {
 
 module core {
 
-module v2_00 {
+module v2_0 {
 
 module services {
 
