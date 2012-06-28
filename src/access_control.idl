@@ -254,7 +254,7 @@ interface AccessControl {
    *
    * \return Objeto a ser usado para efetuar o login.
    */
-  LoginProcess startLoginBySingleSignOn(out EncryptedBlock challenge)
+  LoginProcess startLoginBySharedAuth(out EncryptedBlock challenge)
     raises (ServiceFailure);
   
   /**
