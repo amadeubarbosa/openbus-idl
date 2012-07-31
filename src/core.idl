@@ -22,19 +22,42 @@ module core {
 /**
  * \brief Módulo de versionamento dos Serviços Básicos do OpenBus.
  */
-module v1_05 {
+module v2_0 {
 
-/** \brief Representa um identificador universalmente único. */
-typedef string UUID;
+const octet MajorVersion = 2; /**< \brief Major da versão */
+const octet MinorVersion = 0; /**< \brief Minor da versão */
+const string BusLogin = "00000000-0000-0000-0000-000000000000"; /**< \brief Login usado pelo Barramento */
+const string BusEntity = "OpenBus"; /**< \brief Nome da entidade do Barramento */
+const string BusObjectKey = "OpenBus_2_0"; /**< \brief Chave da entidade do Barramento */
+const unsigned short HashValueSize = 32; /**< \brief Tamanho do hash */
+const unsigned short EncryptedBlockSize = 256;/**< \brief Tamanho do bloco encriptado */
 
 /** \brief Representa um identificador único. */
-typedef UUID Identifier;
+typedef string Identifier;
+/** \brief Representa uma sequência de identificadores. */
+typedef sequence<Identifier> IdentifierSeq;
+
+/* TODO: ajustar o código abaixo depois de corrigir o bug do LuaIDL (OIL-40) */
+//typedef octet HashValue[HashValueSize]; /**< \brief Array de um hash */
+//typedef octet EncryptedBlock[EncryptedBlockSize]; /**< \brief Bloco encriptado */
+typedef octet HashValue[32]; /**< \brief Array de um hash */
+typedef octet EncryptedBlock[256]; /**< \brief Bloco encriptado */
 
 /** \brief Representa uma sequência de bytes. */
 typedef sequence<octet> OctetSeq;
 
-/** \brief Representa uma sequência de booleanos. */
-typedef sequence<boolean> BooleanSeq;
+/**
+ * \brief Módulo dos Serviços Básicos do OpenBus.
+ */
+module services {
+  
+  /** \brief Indica que a operação chamada não é permitida para a entidade. */
+  exception UnauthorizedOperation {};
+  
+  /** \brief Exceção que sinaliza uma falha interna num serviço básico. */
+  exception ServiceFailure { string message; };
+  
+};
 
 }; // version
 

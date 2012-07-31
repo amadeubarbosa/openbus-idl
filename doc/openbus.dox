@@ -23,7 +23,7 @@ PROJECT_NAME           = "OpenBus IDL"
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = 1.6.0
+PROJECT_NUMBER         = 2.0.0
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -53,6 +53,14 @@ CREATE_SUBDIRS         = NO
 
 OUTPUT_LANGUAGE        = Brazilian
 
+# This tag can be used to specify the encoding used in the generated output. 
+# The encoding is not always determined by the language that is chosen, 
+# but also whether or not the output is meant for Windows or non-Windows users. 
+# In case there is a difference, setting the USE_WINDOWS_ENCODING tag to YES 
+# forces the Windows encoding (this is the default for the Windows binary), 
+# whereas setting the tag to NO uses a Unix-style encoding (the default for 
+# all platforms other than Windows).
+
 # The INPUT_ENCODING tag is used to specify the character encoding of the
 # source files that doxygen parses. Internally doxygen uses the UTF-8 encoding,
 # which is also the default input encoding. Doxygen uses libiconv (or the iconv
@@ -68,14 +76,6 @@ INPUT_ENCODING         = ISO-8859-1
 # http://www.gnu.org/software/libiconv for the list of possible encodings.
 
 DOXYFILE_ENCODING      = ISO-8859-1
-
-# This tag can be used to specify the encoding used in the generated output. 
-# The encoding is not always determined by the language that is chosen, 
-# but also whether or not the output is meant for Windows or non-Windows users. 
-# In case there is a difference, setting the USE_WINDOWS_ENCODING tag to YES 
-# forces the Windows encoding (this is the default for the Windows binary), 
-# whereas setting the tag to NO uses a Unix-style encoding (the default for 
-# all platforms other than Windows).
 
 USE_WINDOWS_ENCODING   = NO
 
