@@ -19,13 +19,6 @@ module services {
  */
 module access_control {
 
-/** \brief Nome da faceta de controle de acesso. */
-const string AccessControlFacet = "AccessControl"; // "AccessControl" + Version;
-/** \brief Nome da faceta de registro de logins. */
-const string LoginRegistryFacet = "LoginRegistry"; // "LoginRegistry" + Version;
-/** \brief Nome da faceta de registro de certificados. */
-const string CertificateRegistryFacet = "CertificateRegistry"; // "CertificateRegistry" + Version;
-
 /* minor codes de CORBA::NO_PERMISSION do protocolo OpenBus: */
 /** \brief Minor code de NO_PERMISSION: credencial inválida. */
 const unsigned long InvalidCredentialCode = 0x42555300; // 1112888064 "BUS\0"
