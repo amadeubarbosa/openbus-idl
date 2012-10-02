@@ -231,10 +231,12 @@ interface OfferRegistry {
    * \brief Busca por ofertas que apresentem um conjunto de propriedades
    *        definido.
    * 
-   * Serão selecionadas apenas as ofertas de serviço que apresentem todas as 
-   * propriedades especificadas. As propriedades utilizadas nas buscas podem
-   * ser aquelas fornecidas no momento do registro da oferta de serviço, assim
-   * como as propriedades automaticamente geradas pelo Openbus.
+   * Devolve uma lista contendo apenas as ofertas de serviço que apresentem
+   * todas as  propriedades especificadas. Em particular, caso nenhuma
+   * propriedade seja especificada, nenhuma oferta é incluida no resultado
+   * dessa operação. As propriedades utilizadas nas buscas podem ser aquelas
+   * fornecidas no momento do registro da oferta de serviço, assim como as
+   * propriedades automaticamente geradas pelo registro de ofertas de serviços.
    * 
    * \param properties Propriedades que as ofertas de serviços encontradas
    *                   devem apresentar.
