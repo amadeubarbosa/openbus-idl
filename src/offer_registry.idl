@@ -24,7 +24,9 @@ module offer_registry {
 /* Faceta de Gerência de Ofertas de Serviço *********************************/
 /****************************************************************************/
 
+interface OfferObserver; /* forward declaration */
 interface ServiceOffer; /* forward declaration */
+interface OfferRegistryObserver; /* forward declaration */
 
 
 
@@ -35,8 +37,8 @@ typedef sequence<FacetName> FacetNameSeq;
 
 /** \brief Propriedade que descreve um aspecto de uma oferta de serviço. */
 struct ServiceProperty {
-  string name; /**< \brief nome da propriedade */
-  string value; /**< \brief valor da propriedade */
+  string name; /** \brief nome da propriedade */
+  string value; /** \brief valor da propriedade */
 };
 /** \brief Sequência de propriedades que descrevem uma oferta de serviço. */
 typedef sequence<ServiceProperty> ServicePropertySeq;
@@ -46,12 +48,30 @@ typedef scs::core::IComponent OfferedService;
 
 /** \brief Descreve uma oferta de serviço. */
 struct ServiceOfferDesc {
-  OfferedService service_ref; /**< \brief Referência para o serviço ofertado. */
-  ServicePropertySeq properties; /**< \brief Propriedades do serviço ofertado. */
-  ServiceOffer ref; /**< \brief Objeto que representa a oferta de serviço. */
+  OfferedService service_ref; /** \brief Referência para o serviço ofertado. */
+  ServicePropertySeq properties; /** \brief Propriedades do serviço ofertado. */
+  ServiceOffer ref; /** \brief Objeto que representa a oferta de serviço. */
 };
 /** \brief Sequência de descrições de oferta de serviço. */
 typedef sequence<ServiceOfferDesc> ServiceOfferDescSeq;
+
+/** \brief Descreve uma inscrição de observador de oferta de serviço. */
+struct OfferObserverSubscriptionDesc {
+  OfferObserver observer; /** \brief Referência para o observador. */
+  OfferedService offer; /** \brief Oferta serviço observada.*/
+};
+/** \brief Sequência de descrições de inscrições de observadores */
+typedef sequence<OfferObserverSubscriptionDesc>
+  OfferObserverSubscriptionDescSeq;
+
+/** \brief Descreve uma inscrição de observador de oferta de serviço. */
+struct OfferRegistryObserverSubscriptionDesc {
+  OfferRegistryObserver observer; /** \brief Referência para o observador. */
+  ServicePropertySeq properties; /** \brief Propriedades do serviço ofertado. */
+};
+/** \brief Sequência de descrições de inscrições de observadores */
+typedef sequence<OfferRegistryObserverSubscriptionDesc>
+  OfferRegistryObserverSubscriptionDescSeq;
 
 /** \brief Identificador da inscrição de um observador. */
 typedef long Cookie;
@@ -98,7 +118,7 @@ interface OfferObserver {
 /**
  * \brief Representa um observador de registro de ofertas.
  */
-interface OfferRegistrationObserver {
+interface OfferRegistryObserver {
   /**
    * \brief Notifica que uma oferta que atende ao critério de propriedades do 
    *        observador foi registrada.
@@ -106,6 +126,72 @@ interface OfferRegistrationObserver {
    * \param offer A oferta registrada que atende ao critério de propriedades.
    */
   void offerRegistered(in ServiceOfferDesc offer);
+};
+
+/**
+ * \brief Representa a inscrição de um observador de oferta de serviço.
+ */
+interface OfferObserverSubscription {
+
+  /** \brief Referência para o observador inscrito. */
+  readonly attribute OfferObserver observer;
+  
+  /** \brief Referência para o observador inscrito. */
+  readonly attribute ServiceOffer offer;
+  
+  /**
+   * \brief Devolve uma estrutura descrevedo a inscrição do observador. 
+   *
+   * \return A descrição da inscrição do observador
+   */
+  OfferObserverSubscriptionDesc describe();
+  
+  /**
+   * \brief Remove a incrição do observador.
+   *
+   * Essa operação permite remover a inscrição do observador. Essa operação só
+   * pode ser chamada pela mesma entidade que registrou a oferta ou por uma
+   * entidade com permissão de adminstração no barramento.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é a mesma que
+   *                                  registrou a oferta nem administrador.
+   */
+  void remove() raises (UnauthorizedOperation, ServiceFailure);
+};
+
+/**
+ * \brief Representa a inscrição de um observador de registro oferta de serviço.
+ */
+interface OfferRegistryObserverSubscription {
+  /** \brief Referência para o observador inscrito. */
+  readonly attribute OfferRegistryObserver observer;
+  
+  /**
+   * \brief Lista de propriedades de oferta que o observador está interessado.
+   *
+   * Sempre que uma oferta com essas propriedades é registrada, o observador é
+   * notificado.
+   */
+  readonly attribute ServicePropertySeq properties;
+  
+  /**
+   * \brief Devolve uma estrutura descrevedo a inscrição do observador. 
+   *
+   * \return A descrição da inscrição do observador
+   */
+  OfferRegistryObserverSubscriptionDesc describe();
+  
+  /**
+   * \brief Remove a incrição do observador.
+   *
+   * Essa operação permite remover a inscrição do observador. Essa operação só
+   * pode ser chamada pela mesma entidade que registrou a oferta ou por uma
+   * entidade com permissão de adminstração no barramento.
+   *
+   * \exception UnauthorizedOperation Entidade que chama não é a mesma que
+   *                                  registrou a oferta nem administrador.
+   */
+  void remove() raises (UnauthorizedOperation, ServiceFailure);
 };
 
 /**
@@ -124,6 +210,7 @@ interface ServiceOffer {
    * openbus.offer.id: Ident. único da oferta.
    * openbus.offer.login: Ident. do login com que a oferta foi registrada.
    * openbus.offer.entity: Ident. da entidade que registrou a oferta.
+   * openbus.offer.timestamp: Número indicando o momento do registro da oferta.
    * openbus.offer.year: Ano em que a oferta foi registrada.
    * openbus.offer.month: Número do mês em que a oferta foi registrada.
    * openbus.offer.day: Dia do mês que a oferta foi registrada.
@@ -183,20 +270,12 @@ interface ServiceOffer {
    *
    * \param observer O observador.
    *
-   * \return Um identificador da inscrição do observador.
+   * \return Objeto que representa a inscrição do observador.
    */
-  Cookie subscribeObserver(in OfferObserver observer) raises (ServiceFailure);
-  
-  /**
-   * \brief Remove a inscrição do observador da oferta.
-   *
-   * \param ck O identificador da inscrição do observador.
-   *
-   * \return \c true caso o descadastramento do observador foi bem sucedido e 
-   *         \c false caso contrário.
-   */
-  boolean unsubscribeObserver(in Cookie ck) raises (ServiceFailure);
+  OfferObserverSubscription subscribeObserver(in OfferObserver observer)
+    raises (ServiceFailure);
 };
+
 
 /**
  * \brief Representa o registro de ofertas de serviço.
@@ -261,21 +340,11 @@ interface OfferRegistry {
    * \param properties Propriedades que as ofertas de serviços registradas
    *                   devem apresentar para que o observador seja notificado.
    *
-   * \return Um identificador da inscrição do observador.
+   * \return Objeto que representa a inscrição do observador.
    */
-  Cookie subscribeObserver(in OfferRegistrationObserver observer,
-                           in ServicePropertySeq properties)
-    raises (ServiceFailure);
-
-  /**
-   * \brief Remove a inscrição do observador de registro de ofertas.
-   *
-   * \param ck O identificador da inscrição do observador.
-   *
-   * \return \c true caso o descadastramento do observador foi bem sucedido e 
-   *         \c false caso contrário.
-   */
-  boolean unsubscribeObserver(in Cookie ck)
+  OfferRegistryObserverSubscription subscribeObserver(
+    in OfferRegistryObserver observer,
+    in ServicePropertySeq properties)
     raises (ServiceFailure);
 };
 
@@ -290,19 +359,19 @@ interface EntityCategory; /* forward declaration */
 
 /** \brief Descrição de uma categoria de entidade. */
 struct EntityCategoryDesc {
-  Identifier id;      /**< \brief Identificador da categoria. */
-  string name;        /**< \brief Nome descritivo da categoria. */
-  EntityCategory ref; /**< \brief Objeto que representa a categoria. */
+  Identifier id;      /** \brief Identificador da categoria. */
+  string name;        /** \brief Nome descritivo da categoria. */
+  EntityCategory ref; /** \brief Objeto que representa a categoria. */
 };
 /** \brief Sequência de descrições de catergorias de entidade. */
 typedef sequence<EntityCategoryDesc> EntityCategoryDescSeq;
 
 /** \brief Descrição de uma entidade registrada. */
 struct RegisteredEntityDesc {
-  EntityCategory category; /**< \brief Categoria da entidade. */
-  Identifier id;           /**< \brief Identificador da entidade. */
-  string name;             /**< \brief Nome descritivo da entidade. */
-  RegisteredEntity ref;    /**< \brief Objeto que representa a entidade. */
+  EntityCategory category; /** \brief Categoria da entidade. */
+  Identifier id;           /** \brief Identificador da entidade. */
+  string name;             /** \brief Nome descritivo da entidade. */
+  RegisteredEntity ref;    /** \brief Objeto que representa a entidade. */
 };
 /** \brief Sequência de descrições sobre entidades registradas */
 typedef sequence<RegisteredEntityDesc> RegisteredEntityDescSeq;
@@ -339,8 +408,8 @@ exception AuthorizationInUse { ServiceOfferDescSeq offers; };
  * pelo administrador do sistema.
  */
 interface EntityCategory {
-  readonly attribute Identifier id; /**< \brief Identificador da categoria */
-  readonly attribute string name;   /**< \brief Nome descritivo da categoria */
+  readonly attribute Identifier id; /** \brief Identificador da categoria */
+  readonly attribute string name;   /** \brief Nome descritivo da categoria */
   
   /** 
    * \brief Devolve uma estrutura descrevedo a categoria de entidade.
@@ -410,9 +479,9 @@ interface EntityCategory {
  * autorizadas a ofertar serviços.
  */
 interface RegisteredEntity {
-  readonly attribute EntityCategory category; /**< \brief Categoria da entidade */
-  readonly attribute Identifier id;           /**< \brief Identificador da entidade */
-  readonly attribute string name;             /**< \brief Nome descritivo da entidade */
+  readonly attribute EntityCategory category; /** \brief Categoria da entidade */
+  readonly attribute Identifier id; /** \brief Identificador da entidade */
+  readonly attribute string name; /** \brief Nome descritivo da entidade */
   
   /** 
    * \brief Devolve uma estrutura descrevedo a entidade registrada. 
