@@ -330,7 +330,7 @@ interface OfferRegistry {
    * 
    * \return Sequência de descrições de ofertas de serviço registradas.
    */
-  ServiceOfferDescSeq getServices() raises (ServiceFailure);
+  ServiceOfferDescSeq getAllServices() raises (ServiceFailure);
 
   /**
    * \brief Inscreve um observador de registro de ofertas que atendem ao 
