@@ -151,7 +151,7 @@ interface OfferObserverSubscription {
    *
    * Essa operação permite remover a inscrição do observador. Essa operação só
    * pode ser chamada pela mesma entidade que registrou a oferta ou por uma
-   * entidade com permissão de adminstração no barramento.
+   * entidade com permissão de administração no barramento.
    *
    * \exception UnauthorizedOperation Entidade que chama não é a mesma que
    *                                  registrou a oferta nem administrador.
