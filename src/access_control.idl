@@ -117,7 +117,7 @@ struct LoginInfo {
 typedef sequence<LoginInfo> LoginInfoSeq;
 /** \brief Informações sobre uma cadeia de chamada aninhadas no barramento. */
 struct CallChain {
-  Identifier target; /**< \brief Identificador de login a quem a cadeia se destina. */
+  Identifier target; /**< \brief Nome da entidade a quem a cadeia se destina. */
   LoginInfoSeq originators; /**< \brief Informações de login das entidades que realizaram as chamadas em cadeia que originam essa chamada. */
   LoginInfo caller; /**< \brief Informações de login da entidades que efetivamente fez chamada atual (última da cadeia). */
 };
@@ -264,12 +264,12 @@ interface AccessControl {
   /**
    * \brief Cria uma nova cadeia de chamadas assinada pelo barramento.
    *
-   * A cadeia criada pode ser usada pelo login identificado pelo parâmetro
+   * A cadeia criada pode ser usada pela entidade identificada pelo parâmetro
    * 'target' para se adicionar a uma cadeia original. A cadeia original é
    * definida como a cadeia de chamada dentro da qual a chamada de
    * 'signChainFor' foi originalmente iniciada.
    *
-   * \param target Identificador de login que podera se adicionar a cadeia.
+   * \param target Nome da entidade que podera se adicionar a cadeia.
    *
    * \return A nova cadeia de chamadas assinada.
    */
