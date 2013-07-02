@@ -40,6 +40,8 @@ const unsigned long NoCredentialCode      = 0x42555306; // 1112888070 "BUS\6"
 const unsigned long NoLoginCode           = 0x425553FF; // 1112888319 "BUS\255"
 /** \brief Minor code de NO_PERMISSION: servidor chamado é inválido. */
 const unsigned long InvalidRemoteCode     = 0x425553FE; // 1112888318 "BUS\254"
+/** \brief Minor code de NO_PERMISSION: barramento indisponível. */
+const unsigned long BusUnavailableCode    = 0x425553FD; // 1112888317 "BUS\253"
 
 /****************************************************************************/
 /* Faceta de Gerência de Certificados de Entidades **************************/
