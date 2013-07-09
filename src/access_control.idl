@@ -42,6 +42,8 @@ const unsigned long NoLoginCode           = 0x425553FF; // 1112888319 "BUS\255"
 const unsigned long InvalidRemoteCode     = 0x425553FE; // 1112888318 "BUS\254"
 /** \brief Minor code de NO_PERMISSION: barramento indisponível. */
 const unsigned long BusUnavailableCode    = 0x425553FD; // 1112888317 "BUS\253"
+/** \brief Minor code de NO_PERMISSION: login do alvo da chamada é inválido. */
+const unsigned long InvalidTargetCode     = 0x425553FC; // 1112888316 "BUS\252"
 
 /****************************************************************************/
 /* Faceta de Gerência de Certificados de Entidades **************************/
@@ -138,6 +140,9 @@ exception WrongEncoding { string message; };
 
 /** \brief Indica que o acesso ao barramento foi negado sem justificaiva. */
 exception AccessDenied {};
+
+/** \brief Indica que os seguintes logins são inválidos. */
+exception InvalidLogins { IdentifierSeq loginIds; };
 
 
 
@@ -266,27 +271,22 @@ interface AccessControl {
   /**
    * \brief Cria uma nova cadeia de chamadas assinada pelo barramento.
    *
-   * A cadeia criada pode ser usada pela entidade identificada pelo parâmetro
-   * 'target' para se adicionar a uma cadeia original. A cadeia original é
-   * definida como a cadeia de chamada dentro da qual a chamada de
+   * A cadeia criada pode ser usada pela entidade do login identificado pelo
+   * parâmetro 'target' para se adicionar a uma cadeia original. A cadeia
+   * original é definida como a cadeia de chamada dentro da qual a chamada de
    * 'signChainFor' foi originalmente iniciada.
    *
-   * \param target Nome da entidade que podera se adicionar a cadeia.
+   * \param target Identificador de login que podera se adicionar a cadeia.
    *
    * \return A nova cadeia de chamadas assinada.
    */
   credential::SignedCallChain signChainFor(in Identifier target)
-    raises (ServiceFailure);
+    raises (InvalidLogins, ServiceFailure);
 };
 
 /****************************************************************************/
 /* Faceta de Notificação de Eventos de Credenciais de Autenticação **********/
 /****************************************************************************/
-
-/** \brief Indica que os seguintes logins são inválidos. */
-exception InvalidLogins { IdentifierSeq loginIds; };
-
-
 
 /**
  * \brief Interface a ser implementada por um observador de logins. Esse
