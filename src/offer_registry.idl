@@ -99,7 +99,7 @@ exception InvalidProperties { ServicePropertySeq properties; };
  * \brief Indica que a referência fornecida do serviço não apresenta o formato
  *        esperado, que no caso é um componente SCS bem formado.
  */
-exception InvalidService {};
+exception InvalidService { string message; };
 
 
 /**
