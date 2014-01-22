@@ -64,7 +64,7 @@ typedef sequence<ServiceOfferDesc> ServiceOfferDescSeq;
 /** \brief Descreve uma inscrição de observador de oferta de serviço. */
 struct OfferObserverSubscriptionDesc {
   OfferObserver observer; /** \brief Referência para o observador. */
-  OfferedService offer; /** \brief Oferta serviço observada.*/
+  ServiceOffer offer; /** \brief Oferta serviço observada.*/
 };
 /** \brief Sequência de descrições de inscrições de observadores */
 typedef sequence<OfferObserverSubscriptionDesc>
