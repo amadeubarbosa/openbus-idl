@@ -227,6 +227,7 @@ interface ServiceOffer {
    * openbus.component.version.major: Versão maior do componente SCS que implementa o serviço.
    * openbus.component.version.minor: Versão menor do componente SCS que implementa o serviço.
    * openbus.component.version.patch: Versão de correção do componente SCS que implementa o serviço.
+   * openbus.component.platform: Espeficação da plataforma do componente SCS que implementa o serviço.
    * openbus.component.facet: Nome de faceta oferecida pelo component SCS que implementa o serviço.
    * openbus.component.interface: RepID de interface implementada por faceta do component SCS que implementa o serviço.
    */
