@@ -142,7 +142,7 @@ interface OfferObserverSubscription {
   /** \brief Referência para o observador inscrito. */
   readonly attribute OfferObserver observer;
   
-  /** \brief Referência para o observador inscrito. */
+  /** \brief Referência para oferta observada. */
   readonly attribute ServiceOffer offer;
   
   /**

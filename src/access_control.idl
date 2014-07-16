@@ -308,7 +308,7 @@ interface LoginObserverSubscription {
   void forgetLogins(in IdentifierSeq loginIds) raises (ServiceFailure);
   
   /**
-   * \brief Obtem uma sequência dos logins observados por esse observador.
+   * \brief Obtém uma sequência dos logins observados por esse observador.
    *
    * \return A sequência logins observadas.
    */
@@ -316,7 +316,7 @@ interface LoginObserverSubscription {
   
   /**
    * \brief Remove a inscrição desse observador, fazendo com que mais nenhum
-   *        evento sobre os logins observadas seja mais notificado.
+   *        evento sobre os logins observadas seja notificado.
    */
   void remove() raises (ServiceFailure);
 };
@@ -341,7 +341,8 @@ interface LoginRegistry {
    * 
    * \return Lista de informações de todos os logins ativos da entidade.
    *
-   * \exception UnauthorizedOperation Entidade que chama não é administrador.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador ou
+   *            não é a mesma entidade.
    */
   LoginInfoSeq getEntityLogins(in Identifier entity)
     raises (UnauthorizedOperation, ServiceFailure);
@@ -354,7 +355,8 @@ interface LoginRegistry {
    * \return \c true se o login informado está válido e foi invalidado, ou
    *         \c false se o login informado não é válido.
    *
-   * \exception UnauthorizedOperation Entidade que chama não é administrador.
+   * \exception UnauthorizedOperation Entidade que chama não é administrador ou
+   *            não é a mesma entidade.
    */
   boolean invalidateLogin(in Identifier loginId)
     raises (UnauthorizedOperation, ServiceFailure);
@@ -365,20 +367,22 @@ interface LoginRegistry {
    * \param loginId Identificador do logins sendo consultado.
    * \param pubkey A chave pública da entidade.
    *
+   * \return Informações ds login requisitado.
+   *
    * \exception InvalidLogins Indica que o login informado é inválido.
    */
   LoginInfo getLoginInfo(in Identifier loginId, out OctetSeq pubkey)
     raises (InvalidLogins, ServiceFailure);
   
   /**
-   * \brief Verifica a validade de uma sequência de logins.
+   * \brief Verifica a validade de um login.
    *
-   * \param loginIds Sequência de identificadores de logins sendo consultados.
+   * \param loginId Identificador de login a ser consultado.
    *
-   * \return Uma sequência de valores indicando o tempo máximo (em segundos)
-   *         pelo qual cada login da sequência fornecida permanecerá válido
-   *         sem necessidade de renovação. Caso a validade já tenha expirado,
-   *         o valor indicado é zero, indicando que o login não é mais válido.
+   * \return Valor indicando o tempo máximo (em segundos) pelo qual o login 
+   *         permanecerá válido sem necessidade de renovação. Caso a validade 
+   *         já tenha expirado, o valor indicado é zero, indicando que o login
+   *         não é mais válido.
    */
   ValidityTime getLoginValidity(in Identifier loginId)
     raises (ServiceFailure);
