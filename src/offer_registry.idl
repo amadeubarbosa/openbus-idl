@@ -1,8 +1,8 @@
 /**
  * \mainpage Documentação da IDL
  */
-#ifndef __TECGRAF_OPENBUS_CORE_V20_SERVICES_OFFERREGISTRY_IDL__
-#define __TECGRAF_OPENBUS_CORE_V20_SERVICES_OFFERREGISTRY_IDL__
+#ifndef __TECGRAF_OPENBUS_CORE_V21_SERVICES_OFFERREGISTRY_IDL__
+#define __TECGRAF_OPENBUS_CORE_V21_SERVICES_OFFERREGISTRY_IDL__
 
 /* for the type of object implementing services offered */
 #include "scs.idl"
@@ -66,18 +66,12 @@ struct OfferObserverSubscriptionDesc {
   OfferObserver observer; /** \brief Referência para o observador. */
   ServiceOffer offer; /** \brief Oferta serviço observada.*/
 };
-/** \brief Sequência de descrições de inscrições de observadores */
-typedef sequence<OfferObserverSubscriptionDesc>
-  OfferObserverSubscriptionDescSeq;
 
 /** \brief Descreve uma inscrição de observador de oferta de serviço. */
 struct OfferRegistryObserverSubscriptionDesc {
   OfferRegistryObserver observer; /** \brief Referência para o observador. */
   ServicePropertySeq properties; /** \brief Propriedades do serviço ofertado. */
 };
-/** \brief Sequência de descrições de inscrições de observadores */
-typedef sequence<OfferRegistryObserverSubscriptionDesc>
-  OfferRegistryObserverSubscriptionDescSeq;
 
 /** \brief Identificador da inscrição de um observador. */
 typedef long Cookie;
