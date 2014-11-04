@@ -48,7 +48,6 @@ module data_export {
    * 
    */
   struct ExportedSharedAuth {
-    Identifier bus; /**< \brief UUID do barramento ao qual a cadeia está associada */
     services::access_control::LoginProcess attempt; /**  */
     OctetSeq secret; /**  */
   };
