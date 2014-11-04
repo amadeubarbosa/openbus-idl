@@ -1,0 +1,65 @@
+/**
+ * \mainpage Documentação da IDL
+ */
+#ifndef __TECGRAF_OPENBUS_CORE_V20_DATAEXPORT_IDL__
+#define __TECGRAF_OPENBUS_CORE_V20_DATAEXPORT_IDL__
+
+#include "access_control.idl"
+
+/** \brief Módulo dos sistemas e aplicações do Tecgraf. */
+module tecgraf {
+
+/** \brief Módulo do middleware OpenBus. */
+module openbus {
+
+/** \brief Módulo de definições básicas do OpenBus. */
+module core {
+
+/* \brief Módulo de versionamento dos Serviços Básicos do OpenBus. */
+module v2_1 {
+
+/** \brief Módulo com definições de credenciais usadas para autenticação. */
+module data_export {
+
+  const unsigned long CurrentVersion = 0x42555300; // 1112888064 "BUS\0";
+  //const unsigned long LegacyVersion = 0x00000000; // none;
+  
+  const string MagicTag_CallChain = "BUS\x01";
+  const string MagicTag_SharedAuth = "BUS\x02";
+
+  /**
+   * 
+   */
+  struct ExportedVersion {
+    unsigned long version;
+    OctetSeq encoded;
+  };
+  typedef sequence<ExportedVersion> ExportedVersionSeq;
+  
+  /**
+   * \brief Estrutura utilizada para exportar uma cadeia de chamadas para um stream de bytes
+   */
+  struct ExportedCallChain {
+    Identifier bus; /**< \brief UUID do barramento ao qual a cadeia está associada */
+    credential::SignedData signedChain; /**< \brief Cadeia de chamadas aninhadas da requisição */
+  };
+  
+  /**
+   * 
+   */
+  struct ExportedSharedAuth {
+    services::access_control::LoginProcess attempt; /**  */
+    OctetSeq secret; /**  */
+  };
+
+}; // dataexport
+
+}; // version
+
+}; // core
+
+}; // openbus
+
+}; // tecgraf
+
+#endif
