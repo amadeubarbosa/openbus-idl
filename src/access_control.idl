@@ -79,7 +79,7 @@ typedef sequence<LoginInfo> LoginInfoSeq;
 struct CallChain {
   Identifier target; /**< \brief Nome da entidade a quem a cadeia se destina. */
   LoginInfoSeq originators; /**< \brief Informações de login das entidades que realizaram as chamadas em cadeia que originam essa chamada. */
-  LoginInfo caller; /**< \brief Informações de login da entidades que efetivamente fez chamada atual (última da cadeia). */
+  LoginInfo caller; /**< \brief Informações de login da entidade que efetivamente fez chamada atual (última da cadeia). */
 };
 
 
