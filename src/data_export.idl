@@ -31,7 +31,7 @@ module data_export {
 
   /**
    * \brief Estrutura utilizada para exportar dados versionados de forma
-   *        interoperável para um stream de bytes
+   *        interoperável para um stream de bytes.
    */
   struct ExportedVersion {
     /** Indicação da versão da codificação do dado. */
