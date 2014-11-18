@@ -96,6 +96,9 @@ struct LoginObserverSubscriptionDesc {
 /** \brief Representa o tempo de validade de um login (em segundos). */
 typedef unsigned long ValidityTime;
 
+/** \brief Domínio sobre o qual o número excessivo de tentativas se aplica. */
+enum FailedLoginAttemptDomain { ADDRESS, ENTITY, VALIDATOR };
+
 
 
 /** \brief Indica que a chave de acesso fornecida é inválida. */
@@ -106,6 +109,20 @@ exception WrongEncoding { string message; };
 
 /** \brief Indica que o acesso ao barramento foi negado sem justificaiva. */
 exception AccessDenied {};
+
+/** \brief Indica que autenticação foi negada por número excessivo de tentativas. */
+exception TooManyAttempts {
+  /**
+    * \brief Indica o domínio sobre o qual o número excessivo de tentativas se aplica.
+    *
+    * Os valores possíveis são:
+    *  - ADDRESS: número excessívo de tentativas de um mesmo endereço de rede.
+    *  - ENTITY: número excessívo de tentativas de uma mesma entidade.
+    *  - VALIDATOR: número excessívo de tentativas para um mesmo validador de senha.
+    */
+  FailedLoginAttemptDomain domain;
+  long penaltyTime;
+};
 
 /** \brief Indica que os seguintes logins são inválidos. */
 exception InvalidLogins { IdentifierSeq loginIds; };
@@ -179,10 +196,14 @@ interface AccessControl {
    *                         validador de senha configurado no serviço de
    *                         login validou a senha fornecida para a entidade
    *                         indicada.
+   * \exception TooManyAttempts A autenticação foi recusada por um número 
+   *                            excessivo de tentativas de login com senha
+   *                            inválida.
    */
   LoginInfo loginByPassword(in Identifier entity, in OctetSeq pubkey,
                              in EncryptedBlock encrypted, out ValidityTime validity)
-    raises (InvalidPublicKey, WrongEncoding, AccessDenied, ServiceFailure);
+    raises (InvalidPublicKey, WrongEncoding, AccessDenied, TooManyAttempts,
+            ServiceFailure);
   
   /**
    * \brief Inicia o processo de login por certificado e cria um objeto para
