@@ -61,6 +61,8 @@ module data_export {
   struct LegacyExportedCallChain {
     /** \brief UUID do barramento ao qual a cadeia está associada. */
     Identifier bus;
+    /** \brief Identificador da entidade que recebeu a chamada. */
+    Identifier target;
     /** \brief Informações de login que efetivamente fez a chamada. */
     services::access_control::LoginInfo caller;
     /** \brief Identificador da entidade que originou a chamada. */
