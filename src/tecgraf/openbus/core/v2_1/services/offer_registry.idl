@@ -6,7 +6,7 @@
 
 /* for the type of object implementing services offered */
 #include "scs.idl"
-#include "core.idl"
+#include "tecgraf/openbus/core/v2_1/core.idl"
 
 /** \brief Módulo dos sistemas e aplicações do Tecgraf. */
 module tecgraf {
