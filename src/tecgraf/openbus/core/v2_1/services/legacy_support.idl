@@ -25,17 +25,13 @@ module services {
 /** \brief Módulo com definições de apoio ao suporte legado (OpenBus 2.0). */
 module legacy_support {
 
-  exception InvalidExportedData {};
-
   interface LegacyConverter {
 
     v2_0::services::access_control::LoginProcess convertSharedAuth(
       in access_control::LoginProcess attempt)
-      raises (InvalidExportedData, UnauthorizedOperation);
+      raises (UnauthorizedOperation);
 
-    v2_0::credential::SignedCallChain convertSignedChain(
-      in credential::SignedData chain)
-      raises (InvalidExportedData, UnauthorizedOperation);
+    v2_0::credential::SignedCallChain convertSignedChain();
 
   };
 
