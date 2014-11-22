@@ -33,6 +33,8 @@ module legacy_support {
 
     v2_0::credential::SignedCallChain convertSignedChain();
 
+    v2_0::credential::SignedCallChain signChainFor(in Identifier target);
+
   };
 
 }; // legacy_support
