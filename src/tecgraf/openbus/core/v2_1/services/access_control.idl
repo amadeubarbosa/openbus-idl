@@ -412,8 +412,7 @@ interface LoginRegistry {
    *
    * \exception InvalidLogins Indica que o login informado é inválido.
    */
-  LoginInfo getLoginInfo(in Identifier loginId,
-                         out credential::SignedData signedkey)
+  LoginInfo getLoginInfo(in Identifier loginId, out OctetSeq pubkey)
     raises (InvalidLogins, ServiceFailure);
   
   /**
