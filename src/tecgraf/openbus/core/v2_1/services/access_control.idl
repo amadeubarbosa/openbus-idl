@@ -294,6 +294,9 @@ interface LoginObserver {
  */
 interface LoginObserverSubscription {
   
+  /** \brief Informação do login ao qual a inscrição está atrelada. */
+  readonly attribute LoginInfo owner;
+  
   /** \brief Referência para o observador inscrito. */
   readonly attribute LoginObserver observer;
   
