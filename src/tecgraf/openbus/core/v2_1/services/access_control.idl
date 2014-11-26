@@ -65,6 +65,9 @@ const unsigned long InvalidTargetCode     = 0x425553FC; // 1112888316 "BUS\252"
 /** \brief Indica que não existe certificado associado a entidade. */
 exception MissingCertificate { Identifier entity; };
 
+/** \brief Indica que um token de autenciação externa não foi reconhecido. */
+exception InvalidToken { string message; };
+
 
 
 /** \brief Dados secretos do login de uma entidade no barramento. */
@@ -100,6 +103,9 @@ typedef unsigned long ValidityTime;
 enum FailedLoginAttemptDomain { ADDRESS, ENTITY, VALIDATOR };
 
 
+
+/** \brief Indica que um dado domínio de autenticação não é conhecido. */
+exception UnknownDomain { Identifier domain; };
 
 /** \brief Indica que a chave de acesso fornecida é inválida. */
 exception InvalidPublicKey { string message; };
@@ -158,8 +164,9 @@ interface LoginProcess {
    * \exception AccessDenied A autenticação falhou, pois o dado codificado na
    *                         resposta ao desafio não é o esperado.
    */
-  LoginInfo login(in OctetSeq pubkey, in EncryptedBlock encrypted,
-                   out ValidityTime validity)
+  LoginInfo login(in OctetSeq pubkey,
+                  in EncryptedBlock encrypted,
+                  out ValidityTime validity)
     raises (InvalidPublicKey, WrongEncoding, AccessDenied, ServiceFailure);
   
   /** \brief Cancela o processo de login por certificado. */
@@ -177,6 +184,7 @@ interface AccessControl {
    * \brief Autentica uma entidade através de uma senha.
    *
    * \param entity Identificador da entidade a ser autenticada.
+   * \param domain Identificador do domínio de autenticação.
    * \param pubkey Chave pública a ser associada ao login.
    * \param encrypted Estrutura 'LoginAuthenticationInfo' codificada em CDR e
    *                  encriptada com a chave pública do barramento, onde o campo
@@ -187,6 +195,7 @@ interface AccessControl {
    *
    * \return Identificador do login estabelecido
    *
+   * \exception UnknownDomain O domínio de autenticação não é conhecido.
    * \exception InvalidPublicKey A autenticação falhou, pois a chave pública
    *                             de acesso fornecida é inválida.
    * \exception WrongEncoding A autenticação falhou, pois a senha não foi
@@ -200,10 +209,13 @@ interface AccessControl {
    *                            excessivo de tentativas de login com senha
    *                            inválida.
    */
-  LoginInfo loginByPassword(in Identifier entity, in OctetSeq pubkey,
-                             in EncryptedBlock encrypted, out ValidityTime validity)
-    raises (InvalidPublicKey, WrongEncoding, AccessDenied, TooManyAttempts,
-            ServiceFailure);
+  LoginInfo loginByPassword(in Identifier entity,
+                            in Identifier domain,
+                            in OctetSeq pubkey,
+                            in EncryptedBlock encrypted,
+                            out ValidityTime validity)
+    raises (UnknownDomain, InvalidPublicKey, WrongEncoding, AccessDenied,
+            TooManyAttempts, ServiceFailure);
   
   /**
    * \brief Inicia o processo de login por certificado e cria um objeto para
@@ -269,6 +281,33 @@ interface AccessControl {
    */
   credential::SignedData signChainFor(in Identifier target)
     raises (ServiceFailure);
+
+  /**
+   * \brief Cria uma cadeia de chamadas assinada pelo barramento com
+   *        informações de uma autenticação externa do barramento.
+   *
+   * A cadeia criada pode ser usada pela entidade do login que faz a chamada.
+   * O conteúdo da cadeia é dado pelas informações obitidas através do token
+   * indicado.
+   *
+   * \param domain Nome do tipo de token que será utilizado para seleção do
+   *               validador adequado.
+   * \param encrypted Valor opaco encriptado com a chave pública do barramento
+   *                  que representa uma informação de autenticação externa.
+   *
+   * \exception WrongEncoding A autenticação falhou, pois o token não foi
+   *                          codificado corretamente com a chave pública do
+   *                          barramento.
+   * \exception UnknownDomain Indica que não há nenhum validador configurado
+   *                          para o tipo o domínio de token informado.
+   * \exception InvalidToken Indica que o token informado não foi reconhecido.
+   *
+   * \return A nova cadeia de chamadas assinada.
+   */
+  credential::SignedData signChainByToken(in OctetSeq encrypted,
+                                          in Identifier domain)
+    raises (WrongEncoding, InvalidToken, UnknownDomain, ServiceFailure);
+
 };
 
 /****************************************************************************/
