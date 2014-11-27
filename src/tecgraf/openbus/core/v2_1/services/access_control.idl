@@ -177,8 +177,11 @@ interface LoginProcess {
  * \brief Gerência de controle de acesso de entidades ao barramento.
  */
 interface AccessControl {
-  readonly attribute Identifier busid; /**< \brief Identificador do barramento */
-  readonly attribute OctetSeq buskey; /**< \brief Chave pública do barramento */
+  /** \brief Identificador do barramento */
+  readonly attribute Identifier busid;
+
+  /** \brief Certificado com a chave pública do barramento */
+  readonly attribute OctetSeq certificate;
   
   /**
    * \brief Autentica uma entidade através de uma senha.
