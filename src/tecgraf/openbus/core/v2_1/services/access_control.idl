@@ -298,7 +298,7 @@ interface AccessControl {
    * \param encrypted Valor opaco encriptado com a chave pública do barramento
    *                  que representa uma informação de autenticação externa.
    *
-   * \exception WrongEncoding A autenticação falhou, pois o token não foi
+   * \exception WrongEncoding A requisição falhou, pois o token não foi
    *                          codificado corretamente com a chave pública do
    *                          barramento.
    * \exception UnknownDomain Indica que não há nenhum validador configurado
